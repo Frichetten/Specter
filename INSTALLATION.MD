@@ -1,2 +1,3 @@
-## Required Libraries
-* Cryptography (sudo pip install cryptography)
+## Dependencies
+* Cryptography  (sudo pip install cryptography)
+* Flask         (sudo pip install flask)
