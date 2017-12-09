@@ -1,6 +1,7 @@
 # Specter Wallet Implementation
 # Nicholas Frichette 8/12/2017
 import os
+import requests
 
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
@@ -8,16 +9,22 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives.asymmetric import rsa
 
+from blockchain import *
+
 # ANSI escape sequences
 FAIL = '\033[91m'
 END = '\033[0m'
 OK = '\033[92m'
 
+
 class Wallet:
+
+    NODE_ADDRESS_LIST = ['http://localhost']
 
     publicKey = ""
     privateKey = ""
     value = 0
+    blockchain = None
 
     def __init__(self):
         print 'Instantiating Wallet'
@@ -25,8 +32,8 @@ class Wallet:
         # Determine if keys are present
         if not self.findKeys():
             print FAIL + 'No keys were found' + END
-            ans = raw_input('Would you like to generate ' + \
-                    'a public/private key pair? (y/n): ')
+            ans = raw_input('Would you like to generate ' +
+                            'a public/private key pair? (y/n): ')
 
             if ans.lower() == 'n':
                 print 'Without a key, we can\'t do anything'
@@ -38,19 +45,39 @@ class Wallet:
                 privatePEM = self.serializePrivateKey(private_key)
                 self.writeKey('Private', privatePEM)
 
-                #Generate and serialize public key
+                # Generate and serialize public key
                 public_key = private_key.public_key()
                 print OK + 'Generated Public Key' + END
                 publicPEM = self.serializePublicKey(public_key)                
                 self.writeKey('Public', publicPEM)
 
         print 'Key\'s found!'
-        # load public key
+        # load keys
         self.publicKey = self.loadKey('Public')
         self.privateKey = self.loadKey('Private')
 
+        # Here we would do one of two things. Either we would load our
+        # current blockchain from disk and then download anything we
+        # are missing, or we would download the whole thing if we didn't
+        # previously have it downloaded. Because we are still a prototype
+        # we will always download the whole wallet at startup.
 
-    def verifyTransaction(self, signature, transaction):
+        # Download the blockchain from localhost
+        blockchain_json = self.download_blockchain(self.NODE_ADDRESS_LIST)
+        self.blockchain = Blockchain.unjsonify(blockchain_json)
+        print self.blockchain.print_chain()[0].current_hash
+
+    @staticmethod
+    def download_blockchain(address_list):
+        # Query the nodes for the blockchain
+        # In the future, validation will need to occur
+        blockchain_json = []
+        for address in address_list:
+            request = requests.get(address + ':5000/getblockchain')
+            blockchain_json = request.json()
+        return blockchain_json
+
+    def verify_transaction(self, signature, transaction):
         verification = self.publicKey.verify(
             signature,
             transaction,
@@ -61,7 +88,6 @@ class Wallet:
             hashes.SHA256()
         )
         return verification
-
 
     def signTransaction(self, transaction):
         signature = self.privateKey.sign(
