@@ -1,7 +1,6 @@
 # Specter Node
 # Nick Frichette 9/12/2017
 
-import json
 
 from flask import Flask
 from flask import jsonify

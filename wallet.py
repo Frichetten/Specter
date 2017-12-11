@@ -23,14 +23,14 @@ class Wallet:
 
     publicKey = ""
     privateKey = ""
-    value = 0
+    balance = 0
     blockchain = None
 
     def __init__(self):
         print 'Instantiating Wallet'
 
         # Determine if keys are present
-        if not self.findKeys():
+        if not self.find_keys():
             print FAIL + 'No keys were found' + END
             ans = raw_input('Would you like to generate ' +
                             'a public/private key pair? (y/n): ')
@@ -41,20 +41,20 @@ class Wallet:
                 quit()
             elif ans.lower() == 'y':
                 # Generate and serialize private key
-                private_key = self.generatePrivateKey()
-                privatePEM = self.serializePrivateKey(private_key)
-                self.writeKey('Private', privatePEM)
+                private_key = self.generate_private_key()
+                privatePEM = self.serialize_private_key(private_key)
+                self.write_key('Private', privatePEM)
 
                 # Generate and serialize public key
                 public_key = private_key.public_key()
                 print OK + 'Generated Public Key' + END
-                publicPEM = self.serializePublicKey(public_key)                
-                self.writeKey('Public', publicPEM)
+                publicPEM = self.serialize_public_key(public_key)
+                self.write_key('Public', publicPEM)
 
         print 'Key\'s found!'
         # load keys
-        self.publicKey = self.loadKey('Public')
-        self.privateKey = self.loadKey('Private')
+        self.publicKey = self.load_key('Public')
+        self.privateKey = self.load_key('Private')
 
         # Here we would do one of two things. Either we would load our
         # current blockchain from disk and then download anything we
@@ -63,9 +63,29 @@ class Wallet:
         # we will always download the whole wallet at startup.
 
         # Download the blockchain from localhost
-        blockchain_json = self.download_blockchain(self.NODE_ADDRESS_LIST)
-        self.blockchain = Blockchain.unjsonify(blockchain_json)
-        print self.blockchain.print_chain()[0].current_hash
+        try:
+            blockchain_json = self.download_blockchain(self.NODE_ADDRESS_LIST)
+            self.blockchain = Blockchain.unjsonify(blockchain_json)
+        except requests.exceptions.ConnectionError:
+            print FAIL + 'Failed to connect to nodes. Terminating.' + END
+            exit(1)
+
+        # Now that we have the blockchain we need to determine our balance
+        self.balance = self.get_balance(self.get_address())
+        print 'Balance:', self.balance
+
+    def get_balance(self, address):
+        balance = 0
+        for block in self.blockchain.blocks:
+            if block.transaction['from'] == address:
+                balance -= block.transaction['amount']
+            if block.transaction['to'] == address:
+                balance += block.transaction['amount']
+        return balance
+
+    def get_address(self):
+        address = self.serialize_public_key(self.publicKey)
+        return ''.join(address.split('\n')[1:-2])
 
     @staticmethod
     def download_blockchain(address_list):
@@ -82,26 +102,25 @@ class Wallet:
             signature,
             transaction,
             padding.PSS(
-                mgf = padding.MGF1(hashes.SHA256()),
-                salt_length = padding.PSS.MAX_LENGTH
+                mgf=padding.MGF1(hashes.SHA256()),
+                salt_length=padding.PSS.MAX_LENGTH
             ),
             hashes.SHA256()
         )
         return verification
 
-    def signTransaction(self, transaction):
+    def sign_transaction(self, transaction):
         signature = self.privateKey.sign(
             transaction,
             padding.PSS(
-                mgf = padding.MGF1(hashes.SHA256()),
-                salt_length = padding.PSS.MAX_LENGTH
+                mgf=padding.MGF1(hashes.SHA256()),
+                salt_length=padding.PSS.MAX_LENGTH
             ),
             hashes.SHA256()
         )
         return signature
 
-
-    def loadKey(self, name):
+    def load_key(self, name):
         if name == 'Public':
             with open('./' + name + '.key', 'rb') as key:
                 key = serialization.load_pem_public_key(
@@ -112,42 +131,38 @@ class Wallet:
             with open('./' + name + '.key', 'rb') as key:
                 key = serialization.load_pem_private_key(
                     key.read(),
-                    password = None,
-                    backend = default_backend()
+                    password=None,
+                    backend=default_backend()
                 )
         return key
 
-    
-    def writeKey(self, name, key):
+    def write_key(self, name, key):
         print 'Writing ' + name + ' Key to ./' + name + '.key'
         with open(name + '.key', 'w') as f:
             for line in key.splitlines():
                 f.write(line + '\n')
         print OK + 'Wrote ' + name + ' key to file' + END
 
-    
-    def generatePrivateKey(self):
+    def generate_private_key(self):
         print 'Generating a Private Key'
         private_key = rsa.generate_private_key(
-            public_exponent = 65537,
-            key_size = 4096,
-            backend = default_backend()
+            public_exponent=65537,
+            key_size=4096,
+            backend=default_backend()
         )
         print OK + 'Generated Private Key' + END
         return private_key
 
-
-    def serializePrivateKey(self, private_key):
+    def serialize_private_key(self, private_key):
         privatePEM = private_key.private_bytes(
-            encoding = serialization.Encoding.PEM,
-            format = serialization.PrivateFormat.TraditionalOpenSSL,
-            encryption_algorithm = serialization.NoEncryption()
+            encoding=serialization.Encoding.PEM,
+            format=serialization.PrivateFormat.TraditionalOpenSSL,
+            encryption_algorithm=serialization.NoEncryption()
         )
         print OK + 'Serialized Private Key' + END
         return privatePEM
 
-    
-    def serializePublicKey(self, public_key):
+    def serialize_public_key(self, public_key):
         publicPEM = public_key.public_bytes(
             encoding = serialization.Encoding.PEM,
             format = serialization.PublicFormat.SubjectPublicKeyInfo
@@ -155,13 +170,13 @@ class Wallet:
         print OK + 'Serialized Public Key' + END
         return publicPEM
 
-
-    def findKeys(self):
+    def find_keys(self):
         directory = os.listdir('.')
         if 'Private.key' not in directory \
             or 'Public.key' not in directory: 
                 return False
         return True
+
 
 if __name__ == '__main__':
     wallet = Wallet()

@@ -5,6 +5,9 @@
     disk (I'm not sure what format). Then at 
     startup it will pull the latest blockchain 
     from the nodes in the network"""
+import json
+import hashlib
+
 
 from block import *
 
@@ -28,7 +31,7 @@ class Blockchain:
         for block in self.blocks:
             data = {
                 "index": block.index,
-                "transaction": block.index,
+                "transaction": block.transaction,
                 "previous_hash": block.previous_hash,
                 "current_hash": block.current_hash,
                 "timestamp": block.timestamp,
@@ -64,7 +67,18 @@ class Blockchain:
         print 'Genesis Block Created'
         transaction = {
             "from": "-1",
-            "to": "-1",
+            "to": "MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAuvhSUefYy46cv5khX" +
+                  "eoQaU2C4yZBsRta0RutKDlqzH4ZFi3WAgR6KbfrWcwkwtArHjltrThMjwzQ9j" +
+                  "A8P2wOcuxGYjPlEy7LSyvBz2JC8EuC+o7oP1dUKxTLWreb9cnm1vMQAO+CYne" +
+                  "A1YHeBa4K3DjTwOIEATtukwUSbSH8Uvn5GoFM1cZmJyg4elIWzaNfUKriEY/x" +
+                  "nhoB3aS8sUlEtoTO+K+vwa6dHLFr/tcwhx1ryQ196QTw05U68yw93wVlBPUtb" +
+                  "oKFCfcnXIxO0K3h6gduQrOjLEyaMi9AzhKouNoWKf97+1BhqmReVDz2et25Ue" +
+                  "NdxVJGJbVwSJ4i2nMPzW8aPhpIz7p9LD+EEx3Pli3OiKZDVzDOcMNACU5zVWH" +
+                  "WTKEyOrKDR4aVPeA1TFhoY4xTp94w9cVOIsKGg+V8p6kU1w/V0IWajDGiATRS" +
+                  "VCmF5gpvkJK53Cj5EoOjYozi11qM7z2/hTUooOiQx1lJIU8QCDRkm/31R/Ozo" +
+                  "9TeAqBEkfj1k8TQdSGUxCCiQbC+eV6SvOm4yq2GHkqJbjZLWqI0T8lqCL2UvX" +
+                  "ozMel+Wug82WA+qgyPepRABaIUtFi0Zm7cGJmQSrZEvnkm6H3/VFSgOOKF4EZ" +
+                  "wCQIBxoxoysDPmrzkTyjQfgmywfv4PaFBtUOZSpXUcVwGeJGFspDB5DsCAwEAAQ==",
             "amount": 10,
             "signature": "-1",
             "timestamp": -1,

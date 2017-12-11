@@ -1,7 +1,5 @@
 # Specter Block Implementation
 # Nick Frichette 9/12/2017
-import hashlib
-import json
 
 
 class Block:
