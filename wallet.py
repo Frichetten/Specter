@@ -26,11 +26,11 @@ class Wallet:
     balance = 0
     blockchain = None
 
-    def __init__(self):
+    def __init__(self, wallet_name):
         print 'Instantiating Wallet'
 
         # Determine if keys are present
-        if not self.find_keys():
+        if not self.find_keys(wallet_name):
             print FAIL + 'No keys were found' + END
             ans = raw_input('Would you like to generate ' +
                             'a public/private key pair? (y/n): ')
@@ -42,19 +42,19 @@ class Wallet:
             elif ans.lower() == 'y':
                 # Generate and serialize private key
                 private_key = self.generate_private_key()
-                privatePEM = self.serialize_private_key(private_key)
-                self.write_key('Private', privatePEM)
+                private_pem = self.serialize_private_key(private_key)
+                self.write_key('Private', private_pem)
 
                 # Generate and serialize public key
                 public_key = private_key.public_key()
                 print OK + 'Generated Public Key' + END
-                publicPEM = self.serialize_public_key(public_key)
-                self.write_key('Public', publicPEM)
+                public_pem = self.serialize_public_key(public_key)
+                self.write_key('Public', public_pem)
 
         print 'Key\'s found!'
         # load keys
-        self.publicKey = self.load_key('Public')
-        self.privateKey = self.load_key('Private')
+        self.publicKey = self.load_key(wallet_name + '/Public')
+        self.privateKey = self.load_key(wallet_name + '/Private')
 
         # Here we would do one of two things. Either we would load our
         # current blockchain from disk and then download anything we
@@ -72,7 +72,10 @@ class Wallet:
 
         # Now that we have the blockchain we need to determine our balance
         self.balance = self.get_balance(self.get_address())
-        print 'Balance:', self.balance
+
+    def display_address_and_balance(self):
+        print "Wallet Address:", self.get_address()[:20] + "..."
+        print "Balance:", self.get_balance(self.get_address())
 
     def get_balance(self, address):
         balance = 0
@@ -121,13 +124,13 @@ class Wallet:
         return signature
 
     def load_key(self, name):
-        if name == 'Public':
+        if 'Public' in name:
             with open('./' + name + '.key', 'rb') as key:
                 key = serialization.load_pem_public_key(
                     key.read(),
-                    backend = default_backend()
+                    backend=default_backend()
                 )
-        elif name == 'Private':
+        elif 'Private' in name:
             with open('./' + name + '.key', 'rb') as key:
                 key = serialization.load_pem_private_key(
                     key.read(),
@@ -163,20 +166,19 @@ class Wallet:
         return privatePEM
 
     def serialize_public_key(self, public_key):
-        publicPEM = public_key.public_bytes(
-            encoding = serialization.Encoding.PEM,
-            format = serialization.PublicFormat.SubjectPublicKeyInfo
+        public_pem = public_key.public_bytes(
+            encoding=serialization.Encoding.PEM,
+            format=serialization.PublicFormat.SubjectPublicKeyInfo
         )
-        print OK + 'Serialized Public Key' + END
-        return publicPEM
+        return public_pem
 
-    def find_keys(self):
-        directory = os.listdir('.')
+    def find_keys(self, wallet_name):
+        directory = os.listdir('./'+wallet_name)
         if 'Private.key' not in directory \
-            or 'Public.key' not in directory: 
-                return False
+                or 'Public.key' not in directory:
+                    return False
         return True
 
 
 if __name__ == '__main__':
-    wallet = Wallet()
+    pass

@@ -1,6 +1,7 @@
 # Ignore Keys #
 ###############
 *.key
+key-*
 
 # Ignore Compiled Source #
 ##########################
