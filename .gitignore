@@ -1,7 +1,12 @@
 # Ignore Keys #
 ###############
 *.key
+key-*
 
 # Ignore Compiled Source #
 ##########################
 *.pyc
+
+# Ignore PyCharm Configs #
+##########################
+./.idea/*
