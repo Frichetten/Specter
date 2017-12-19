@@ -31,25 +31,16 @@ class Wallet:
 
         # Determine if keys are present
         if not self.find_keys(wallet_name):
-            print FAIL + 'No keys were found' + END
-            ans = raw_input('Would you like to generate ' +
-                            'a public/private key pair? (y/n): ')
+            # Generate and serialize private key
+            private_key = self.generate_private_key()
+            private_pem = self.serialize_private_key(private_key)
+            self.write_key('Private', private_pem)
 
-            if ans.lower() == 'n':
-                print 'Without a key, we can\'t do anything'
-                print FAIL + 'Terminating Wallet' + END
-                quit()
-            elif ans.lower() == 'y':
-                # Generate and serialize private key
-                private_key = self.generate_private_key()
-                private_pem = self.serialize_private_key(private_key)
-                self.write_key('Private', private_pem)
-
-                # Generate and serialize public key
-                public_key = private_key.public_key()
-                print OK + 'Generated Public Key' + END
-                public_pem = self.serialize_public_key(public_key)
-                self.write_key('Public', public_pem)
+            # Generate and serialize public key
+            public_key = private_key.public_key()
+            print OK + 'Generated Public Key' + END
+            public_pem = self.serialize_public_key(public_key)
+            self.write_key('Public', public_pem)
 
         print 'Key\'s found!'
         # load keys
