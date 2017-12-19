@@ -27,10 +27,9 @@ class Wallet:
     blockchain = None
 
     def __init__(self, wallet_name):
-        print 'Instantiating Wallet'
-
         # Determine if keys are present
-        if not self.find_keys(wallet_name):
+        if self.find_keys(wallet_name):
+            print wallet_name
             # Generate and serialize private key
             private_key = self.generate_private_key()
             private_pem = self.serialize_private_key(private_key)

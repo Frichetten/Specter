@@ -18,4 +18,12 @@ if __name__ == '__main__':
         if 'key-' in item:
             wallets[item[item.index('-')+1:]] = Wallet(item)
 
-    print wallets['First Wallet'].balance
+    # If there are no keys, then we need to offer the chance to make a wallet
+    if len(wallets.keys()) == 0:
+        ans = raw_input("We didn't find a wallet, would you like to create one? [y/n]: ")
+        if ans == 'y':
+            name = raw_input("What would you like to name the wallet?: ")
+            print "Creating " + name
+        if ans == 'n':
+            print "With no keys we'll have to exit. Goodbye"
+            exit(0)
