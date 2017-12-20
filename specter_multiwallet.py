@@ -24,6 +24,7 @@ if __name__ == '__main__':
         if ans == 'y':
             name = raw_input("What would you like to name the wallet?: ")
             print "Creating " + name
+            wallets['key-' + name] = Wallet(name)
         if ans == 'n':
             print "With no keys we'll have to exit. Goodbye"
             exit(0)

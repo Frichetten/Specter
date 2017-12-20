@@ -28,7 +28,7 @@ class Wallet:
 
     def __init__(self, wallet_name):
         # Determine if keys are present
-        if self.find_keys(wallet_name):
+        if not self.find_keys(wallet_name):
             print wallet_name
             # Generate and serialize private key
             private_key = self.generate_private_key()
@@ -163,11 +163,15 @@ class Wallet:
         return public_pem
 
     def find_keys(self, wallet_name):
-        directory = os.listdir('./'+wallet_name)
-        if 'Private.key' not in directory \
-                or 'Public.key' not in directory:
-                    return False
-        return True
+        try:
+            directory = os.listdir('./key-'+wallet_name)
+            if 'Private.key' not in directory \
+                    or 'Public.key' not in directory:
+                        return False
+            return True
+        except OSError as e:
+            print e
+            return False
 
 
 if __name__ == '__main__':
