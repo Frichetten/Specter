@@ -1,5 +1,5 @@
 # Specter MultiWallet Implementation
-# Nick Frichette 10/12/2017
+# Nick Frichette 12/10/2017
 
 """The purpose of the multiwallet is to provide an interface for users
     to interact with their Specter wallets. This application will show
@@ -28,3 +28,16 @@ if __name__ == '__main__':
         if ans == 'n':
             print "With no keys we'll have to exit. Goodbye"
             exit(0)
+
+    """ Now that we've loaded the wallets, lets give the users some choices """
+    ans = ""
+    while ans != 'exit':
+        print "Welcome to Specter Multi_Wallet V0.02"
+        print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+        print ""
+        print "To begin, select a wallet listed below"
+        print ""
+        for i, item in enumerate(wallets.keys()):
+            print "("+str(i)+") " + wallets[item].name
+        
+        ans = raw_input(">> ")

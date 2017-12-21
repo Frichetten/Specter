@@ -1,5 +1,5 @@
 # Specter BlockChain Implementation
-# Nick Frichette 9/12/2017
+# Nick Frichette 12/9/2017
 """For now the block chain will be in memory
     At some point, this will get written to 
     disk (I'm not sure what format). Then at 
