@@ -7,15 +7,17 @@
     create more."""
 
 from wallet import *
+from blockchain import *
 
 if __name__ == '__main__':
 
     wallets = {}
+    blockchain = Blockchain()
 
     # The convention for identifying wallets it having the public and
     # private keys in a local directory with the name key-"wallet name"
     for item in os.listdir('.'):
-        if 'key-' in item:
+        if 'key-' in item and 'nodekey' not in item:
             wallets[item[item.index('-')+1:]] = Wallet(item)
 
     # If there are no keys, then we need to offer the chance to make a wallet

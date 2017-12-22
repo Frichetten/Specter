@@ -96,16 +96,6 @@ class Wallet:
         address = self.serialize_public_key(self.publicKey)
         return ''.join(address.split('\n')[1:-2])
 
-    @staticmethod
-    def download_blockchain(address_list):
-        # Query the nodes for the blockchain
-        # In the future, validation will need to occur
-        blockchain_json = []
-        for address in address_list:
-            request = requests.get(address + ':5000/getblockchain')
-            blockchain_json = request.json()
-        return blockchain_json
-
     def verify_transaction(self, signature, transaction):
         verification = self.publicKey.verify(
             signature,

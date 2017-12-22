@@ -11,7 +11,7 @@ class Node:
 
     def __init__(self):
         # Need to instantiate the Blockchain
-        self.blockchain = Blockchain()
+        self.blockchain = Blockchain(is_node=True)
 
 
 if __name__ == '__main__':
