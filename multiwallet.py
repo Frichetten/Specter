@@ -12,7 +12,7 @@ from blockchain import *
 if __name__ == '__main__':
 
     wallets = {}
-    blockchain = Blockchain()
+    blockchain = Blockchain(is_node=False)
 
     # The convention for identifying wallets it having the public and
     # private keys in a local directory with the name key-"wallet name"
@@ -54,6 +54,7 @@ if __name__ == '__main__':
             while ians != 'exit':
                 print "(0) Display Address"
                 print "(1) Send Amount to Other Wallet"
-                print wallets[guide[int(ans)]].balance
+                twallet = wallets[guide[int(ans)]]
+                print "Balance: " + str(twallet.get_balance(twallet.get_address(), blockchain))
 
                 ians = raw_input(wallets[guide[int(ans)]].name+">> ")

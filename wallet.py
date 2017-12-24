@@ -16,7 +16,6 @@ FAIL = '\033[91m'
 END = '\033[0m'
 OK = '\033[92m'
 
-
 class Wallet:
 
     NODE_ADDRESS_LIST = ['http://localhost']
@@ -25,7 +24,6 @@ class Wallet:
     publicKey = ""
     privateKey = ""
     balance = 0
-    blockchain = None
 
     def __init__(self, wallet_name):
         # Determine if keys are present
@@ -83,9 +81,9 @@ class Wallet:
         print "Wallet Address:", self.get_address()[:20] + "..."
         print "Balance:", self.get_balance(self.get_address())
 
-    def get_balance(self, address):
+    def get_balance(self, address, blockchain):
         balance = 0
-        for block in self.blockchain.blocks:
+        for block in blockchain.blocks:
             if block.transaction['from'] == address:
                 balance -= block.transaction['amount']
             if block.transaction['to'] == address:

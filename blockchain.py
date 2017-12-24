@@ -7,6 +7,7 @@
     from the nodes in the network"""
 import json
 import hashlib
+import requests
 
 
 from block import *
@@ -26,9 +27,15 @@ class Blockchain:
         else:
             # This is an implementation meant for normal users
             address_list = ['http://localhost']
+            try:
+                blockchain_json = self.download_blockchain(address_list)
+                self.unjsonify(blockchain_json)
+            except requests.exceptions.ConnectionError:
+                print "Failed to connect to nodes. Terminating"
+                exit()
 
     
-    def download_blockchain(address_list):
+    def download_blockchain(self, address_list):
         # Query the nodes for the blockchain
         # In the future validation will need to occur
         blockchain_json = []
@@ -53,8 +60,7 @@ class Blockchain:
             i += 1
         return data_json
 
-    @staticmethod
-    def unjsonify(json_data):
+    def unjsonify(self, json_data):
         blockc = None
         for block in json_data:
             js = json_data[block]
@@ -66,11 +72,8 @@ class Blockchain:
                 js['timestamp'],
                 js['nonce']
             )
-            if blockc is None:
-                blockc = Blockchain(block)
-            else:
-                blockc.add_block(block)
-        return blockc
+            self.blocks.append(block)
+        return None
 
     def print_chain(self):
         return self.blocks
@@ -79,18 +82,18 @@ class Blockchain:
         print 'Genesis Block Created'
         transaction = {
             "from": "-1",
-            "to": "MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAuvhSUefYy46cv5khX" +
-                  "eoQaU2C4yZBsRta0RutKDlqzH4ZFi3WAgR6KbfrWcwkwtArHjltrThMjwzQ9j" +
-                  "A8P2wOcuxGYjPlEy7LSyvBz2JC8EuC+o7oP1dUKxTLWreb9cnm1vMQAO+CYne" +
-                  "A1YHeBa4K3DjTwOIEATtukwUSbSH8Uvn5GoFM1cZmJyg4elIWzaNfUKriEY/x" +
-                  "nhoB3aS8sUlEtoTO+K+vwa6dHLFr/tcwhx1ryQ196QTw05U68yw93wVlBPUtb" +
-                  "oKFCfcnXIxO0K3h6gduQrOjLEyaMi9AzhKouNoWKf97+1BhqmReVDz2et25Ue" +
-                  "NdxVJGJbVwSJ4i2nMPzW8aPhpIz7p9LD+EEx3Pli3OiKZDVzDOcMNACU5zVWH" +
-                  "WTKEyOrKDR4aVPeA1TFhoY4xTp94w9cVOIsKGg+V8p6kU1w/V0IWajDGiATRS" +
-                  "VCmF5gpvkJK53Cj5EoOjYozi11qM7z2/hTUooOiQx1lJIU8QCDRkm/31R/Ozo" +
-                  "9TeAqBEkfj1k8TQdSGUxCCiQbC+eV6SvOm4yq2GHkqJbjZLWqI0T8lqCL2UvX" +
-                  "ozMel+Wug82WA+qgyPepRABaIUtFi0Zm7cGJmQSrZEvnkm6H3/VFSgOOKF4EZ" +
-                  "wCQIBxoxoysDPmrzkTyjQfgmywfv4PaFBtUOZSpXUcVwGeJGFspDB5DsCAwEAAQ==",
+            "to": "MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAupSwIG17vricebp6EN88"+ 
+                  "7wzHj0OsaxYl24z2VT6U9+ByEoGGWOPC/Nv9jwebzCLT49Bv5nZL0c7WCQMvvb5o"+
+                  "3BNk2wPZR6XEQBZxgwXJdt5h2Ye+Nyc8wYvZodp1ouUv2jCNvcnH4VCz6y56yPzc"+
+                  "861ZeYGGO9xbTu7RLkBqGODIqNqLzRhIdpYDukz2TVgHrEXalu+SFkrHo+oc5OBg"+
+                  "YYLQeOSlzRKxgfvFG9ViNlqHP0tQDQsGnakBFuBWW5DuwrEKjqkmM+dxo9ALNaag"+
+                  "ELpB60zXK2ZxwdvOmko8KZNsHVQMzZql2hcJiyfc99OvOBgp/xTscK94NNqQ6m2M"+
+                  "pFr8V07XFnRB8r1EQhY9oFuraUi9xSZbKc3DVG3FEfSyo2Q/+jT+9dkSt7GegIya"+
+                  "wM3saOY2VeN1f8XsfQ+a96SL+ltas99NlDJGMuOJOjrKherpfEBcuEK5EvljceGy"+
+                  "b7O4NyUcQ/k0q/ngQM+Lz5/3RUShqCbtkmjH5FAxiNHzluy83hJyxGxrYHTEMF88"+
+                  "Z6YHyaOBUpMp3mvPMVqM/jeI2aslJDTEDmeaRhs6yI90RDyohzb1FUctUKVPiL8a"+
+                  "FI9/gKmSCpgB8BEpI23K0az4kbItnWLe3xzABSFL0nSQWkXQqWmepKcDwp6TcJtG"+
+                  "/U5BSE284qlQFOd50rW0xRUCAwEAAQ==",
             "amount": 10,
             "signature": "-1",
             "timestamp": -1,
