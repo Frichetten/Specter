@@ -1,6 +1,10 @@
 # Specter
 Specter is a prototype cryptocurrency developed by Nick Frichette
 
+<p align="center">
+  <img src=https://github.com/frichetten/specter/raw/master/specter.png />
+</p>
+
 Satoshi Nakamoto's original white paper can be found [here](https://bitcoin.org/bitcoin.pdf)
 
 **What makes Specter unique as a cryptocurrency?:** Unlike most cryptocurrencies, Specter isn't trying to become an ICO or get sold on an exchange. Instead, Specter is a research project focused on overcoming the technical challenges of Blockchain technology.

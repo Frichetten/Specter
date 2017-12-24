@@ -1,5 +1,5 @@
 # Specter Block Implementation
-# Nick Frichette 9/12/2017
+# Nick Frichette 12/9/2017
 
 
 class Block:

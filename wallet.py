@@ -1,5 +1,5 @@
 # Specter Wallet Implementation
-# Nicholas Frichette 8/12/2017
+# Nicholas Frichette 12/8/2017
 import os
 import requests
 
@@ -21,38 +21,38 @@ class Wallet:
 
     NODE_ADDRESS_LIST = ['http://localhost']
 
+    name = ""
     publicKey = ""
     privateKey = ""
     balance = 0
     blockchain = None
 
     def __init__(self, wallet_name):
-        print 'Instantiating Wallet'
-
         # Determine if keys are present
         if not self.find_keys(wallet_name):
-            print FAIL + 'No keys were found' + END
-            ans = raw_input('Would you like to generate ' +
-                            'a public/private key pair? (y/n): ')
 
-            if ans.lower() == 'n':
-                print 'Without a key, we can\'t do anything'
-                print FAIL + 'Terminating Wallet' + END
-                quit()
-            elif ans.lower() == 'y':
-                # Generate and serialize private key
-                private_key = self.generate_private_key()
-                private_pem = self.serialize_private_key(private_key)
-                self.write_key('Private', private_pem)
+            wallet_name = './key-'+wallet_name
 
-                # Generate and serialize public key
-                public_key = private_key.public_key()
-                print OK + 'Generated Public Key' + END
-                public_pem = self.serialize_public_key(public_key)
-                self.write_key('Public', public_pem)
+            # Make the directory for the keys
+            os.mkdir(wallet_name)
 
-        print 'Key\'s found!'
-        # load keys
+            # Generate and serialize private key
+            private_key = self.generate_private_key()
+            private_pem = self.serialize_private_key(private_key)
+            self.write_key(wallet_name+'/Private', private_pem)
+
+            # Generate and serialize public key
+            public_key = private_key.public_key()
+            print OK + 'Generated Public Key' + END
+            public_pem = self.serialize_public_key(public_key)
+            self.write_key(wallet_name+'/Public', public_pem)
+
+        print 'Key\'s found!: ' + wallet_name
+
+        # Set the name
+        self.name = wallet_name
+
+        # Load keys
         self.publicKey = self.load_key(wallet_name + '/Public')
         self.privateKey = self.load_key(wallet_name + '/Private')
 
@@ -62,16 +62,22 @@ class Wallet:
         # previously have it downloaded. Because we are still a prototype
         # we will always download the whole wallet at startup.
 
+        """ The following is outdated logic. A wallet should not maintain a full copy of the 
+            block chain. This doesn't make any sense if you consider having multiple wallets.
+            Each wallet tracking their own blockchain would become expensive quickly. Instead 
+            the application running the wallets (wether that is the multiwallet or the node 
+            itself) should handle the blockcahin. """
+
         # Download the blockchain from localhost
-        try:
-            blockchain_json = self.download_blockchain(self.NODE_ADDRESS_LIST)
-            self.blockchain = Blockchain.unjsonify(blockchain_json)
-        except requests.exceptions.ConnectionError:
-            print FAIL + 'Failed to connect to nodes. Terminating.' + END
-            exit(1)
+        #try:
+        #    blockchain_json = self.download_blockchain(self.NODE_ADDRESS_LIST)
+        #    self.blockchain = Blockchain.unjsonify(blockchain_json)
+        #except requests.exceptions.ConnectionError:
+        #    print FAIL + 'Failed to connect to nodes. Terminating.' + END
+        #    exit(1)
 
         # Now that we have the blockchain we need to determine our balance
-        self.balance = self.get_balance(self.get_address())
+        #self.balance = self.get_balance(self.get_address())
 
     def display_address_and_balance(self):
         print "Wallet Address:", self.get_address()[:20] + "..."
@@ -89,16 +95,6 @@ class Wallet:
     def get_address(self):
         address = self.serialize_public_key(self.publicKey)
         return ''.join(address.split('\n')[1:-2])
-
-    @staticmethod
-    def download_blockchain(address_list):
-        # Query the nodes for the blockchain
-        # In the future, validation will need to occur
-        blockchain_json = []
-        for address in address_list:
-            request = requests.get(address + ':5000/getblockchain')
-            blockchain_json = request.json()
-        return blockchain_json
 
     def verify_transaction(self, signature, transaction):
         verification = self.publicKey.verify(
@@ -125,13 +121,13 @@ class Wallet:
 
     def load_key(self, name):
         if 'Public' in name:
-            with open('./' + name + '.key', 'rb') as key:
+            with open(name + '.key', 'rb') as key:
                 key = serialization.load_pem_public_key(
                     key.read(),
                     backend=default_backend()
                 )
         elif 'Private' in name:
-            with open('./' + name + '.key', 'rb') as key:
+            with open(name + '.key', 'rb') as key:
                 key = serialization.load_pem_private_key(
                     key.read(),
                     password=None,
@@ -173,11 +169,14 @@ class Wallet:
         return public_pem
 
     def find_keys(self, wallet_name):
-        directory = os.listdir('./'+wallet_name)
-        if 'Private.key' not in directory \
-                or 'Public.key' not in directory:
-                    return False
-        return True
+        try:
+            directory = os.listdir(wallet_name)
+            if 'Private.key' not in directory \
+                    or 'Public.key' not in directory:
+                        return False
+            return True
+        except OSError as e:
+            return False
 
 
 if __name__ == '__main__':

@@ -1,5 +1,5 @@
 # Specter BlockChain Implementation
-# Nick Frichette 9/12/2017
+# Nick Frichette 12/9/2017
 """For now the block chain will be in memory
     At some point, this will get written to 
     disk (I'm not sure what format). Then at 
@@ -16,14 +16,26 @@ class Blockchain:
    
     blocks = []
 
-    def __init__(self, copy=None):
-        if len(self.blocks) == 0 and copy is None:
+    def __init__(self, is_node=False):
+        if is_node:
+            print 'Thank you for standing up a node!'
             print 'No blocks in chain'
             print 'Creating Genesis Block'
             genesis = self.make_genesis_block()
             self.add_block(genesis)
         else:
-            self.add_block(copy)
+            # This is an implementation meant for normal users
+            address_list = ['http://localhost']
+
+    
+    def download_blockchain(address_list):
+        # Query the nodes for the blockchain
+        # In the future validation will need to occur
+        blockchain_json = []
+        for address in address_list:
+            request = requests.get(address + ':5000/getblockchain')
+            blockchain_json = request.json()
+        return blockchain_json
 
     def jsonify(self):
         data_json = {}
