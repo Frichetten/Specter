@@ -24,6 +24,7 @@ if __name__ == '__main__':
     # Spawn our own node and get blockchain
     node = Node()
     blockchain = node.blockchain
+    wallet = None
 
     # Our node should have its own wallet.
     # The convention for node wallets is different from a
@@ -31,14 +32,16 @@ if __name__ == '__main__':
     # called nodekey. This is because a node should have
     # only one address to mine from. As well as to simplify
     # the issue of having a normal wallet in the same directory.
-    wallet = None
     for item in os.listdir('.'):
         if 'nodekey' in item:
             wallet = Wallet(item)
 
     if wallet is None:
-        print 'No wallet detected. Exiting'
-        exit()
+        print 'No wallet detected. Let\'s generate one'
+        print "Creating nodekey"
+        wallet = Wallet('nodekey')
+
+    print wallet.get_address()
 
     app.run()
 

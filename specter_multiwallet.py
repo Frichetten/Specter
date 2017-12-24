@@ -33,6 +33,7 @@ if __name__ == '__main__':
 
     """ Now that we've loaded the wallets, lets give the users some choices """
     ans = ""
+    guide = {}
     while ans != 'exit':
         print "Welcome to Specter Multi_Wallet V0.02"
         print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
@@ -40,6 +41,19 @@ if __name__ == '__main__':
         print "To begin, select a wallet listed below"
         print ""
         for i, item in enumerate(wallets.keys()):
+            guide[i] = item
             print "("+str(i)+") " + wallets[item].name
+        print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+        print "To select a wallet please enter a number and hit [Enter]"
         
         ans = raw_input(">> ")
+
+        if ans!= 'exit' and guide[int(ans)] in wallets.keys():
+            print "\033[H\033[J\r"
+            ians = ""
+            while ians != 'exit':
+                print "(0) Display Address"
+                print "(1) Send Amount to Other Wallet"
+                print wallets[guide[int(ans)]].balance
+
+                ians = raw_input(wallets[guide[int(ans)]].name+">> ")
