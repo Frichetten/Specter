@@ -29,7 +29,7 @@ class Wallet:
         # Determine if keys are present
         if not self.find_keys(wallet_name):
 
-            wallet_name = './key-'+wallet_name
+            wallet_name = 'key-'+wallet_name
 
             # Make the directory for the keys
             os.mkdir(wallet_name)
@@ -48,7 +48,7 @@ class Wallet:
         print 'Key\'s found!: ' + wallet_name
 
         # Set the name
-        self.name = wallet_name
+        self.name = wallet_name[4:]
 
         # Load keys
         self.publicKey = self.load_key(wallet_name + '/Public')
