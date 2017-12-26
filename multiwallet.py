@@ -43,14 +43,23 @@ if __name__ == '__main__':
         print ""
         for i, item in enumerate(wallets.keys()):
             guide[i] = item
-            print "("+str(i)+") " + wallets[item].name
+            print "("+str(i)+") " + wallets[item].name[4:]
         print ""
         print "To select a wallet please enter a number and hit [Enter]"
+        print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+        print "To create a wallet please enter 'c' and hit [Enter]"
         print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
         
         ans = raw_input(">> ")
 
-        if ans!= 'exit' and guide[int(ans)] in wallets.keys():
+        # If the input is 'c' we need to create a new wallet
+        if ans == 'c':
+            name = raw_input("What would you like to name the wallet?: ")
+            print "Creating " + name
+            wallets['key-' + name] = Wallet(name)
+
+        # If the use selects a number, we should check if it is a valid selection
+        elif ans != 'exit' and guide[int(ans)] in wallets.keys():
             print "\033[H\033[J",  # Note the comma
             ians = ""
             while ians != 'exit':
