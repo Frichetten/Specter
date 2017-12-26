@@ -7,9 +7,19 @@
     create more."""
 
 import shutil
+import copy
 
 from wallet import *
 from blockchain import *
+
+
+def create_wallet(wallet_dict):
+    wallet_name = raw_input("What would you like to name the wallet?: ")
+    print "Creating " + wallet_name
+    return_wallet = copy.copy(wallet_dict)
+    return_wallet[wallet_name] = Wallet(wallet_name)
+    return return_wallet
+
 
 if __name__ == '__main__':
 
@@ -26,9 +36,7 @@ if __name__ == '__main__':
     if len(wallets.keys()) == 0:
         ans = raw_input("We didn't find a wallet, would you like to create one? [y/n]: ")
         if ans == 'y':
-            name = raw_input("What would you like to name the wallet?: ")
-            print "Creating " + name
-            wallets[name] = Wallet(name)
+            wallets = create_wallet(wallets)
         if ans == 'n':
             print "With no keys we'll have to exit. Goodbye"
             exit(0)
@@ -58,20 +66,23 @@ if __name__ == '__main__':
 
         # If the input is 'c' we need to create a new wallet
         if ans == 'c':
-            name = raw_input("What would you like to name the wallet?: ")
-            print "Creating " + name
-            wallets[name] = Wallet(name)
+            wallets = create_wallet(wallets)
 
         # If the input is 'd' we need to delete a wallet
         elif ans == 'd':
-            name = raw_input("Which wallet would you like to delete?: ")
+            selection = raw_input("Which wallet would you like to delete?: ")
             ans = raw_input("Are you sure you want to delete this wallet? It cannot be undone[y/n]: ")
             if ans == 'n':
                 print "Deletion aborted"
             elif ans == 'y':
-                name = wallets[guide[int(name)]].name
-                print name
-                raw_input("ff")
+                name = wallets[guide[int(selection)]].name
+                print "Wallet to delete: " + name
+                proof = raw_input("Please type the name of the wallet to finalize decision [" + name + "]: ")
+                if proof == name:
+                    wallets.pop(name, None)
+                    shutil.rmtree('key-'+name)
+                else:
+                    print "Name improperly typed. Aborting!"
 
         # If the user selects a number, we should check if it is a valid selection
         elif ans != 'exit' and guide[int(ans)] in wallets.keys():
