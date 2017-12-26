@@ -21,6 +21,21 @@ def create_wallet(wallet_dict):
     return return_wallet
 
 
+def delete_wallet(wallet_dict, wallet_name):
+    yn = raw_input("Are you sure you want to delete this wallet? It cannot be undone[y/n]: ")
+    if yn == 'n':
+        print "Deletion aborted"
+    elif yn == 'y':
+        name = wallet_name.name
+        print "Wallet to delete: " + name
+        proof = raw_input("Please type the name of the wallet to finalize decision [" + name + "]: ")
+        if proof == name:
+            wallet_dict.pop(name, None)
+            shutil.rmtree('key-' + name)
+        else:
+            print "Name improperly typed. Aborting!"
+
+
 if __name__ == '__main__':
 
     wallets = {}
@@ -59,8 +74,6 @@ if __name__ == '__main__':
         print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
         print "To create a wallet please enter 'c' and hit [Enter]"
         print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-        print "To delete a wallet please enter 'd' and hit [Enter]"
-        print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
         
         ans = raw_input(">> ")
 
@@ -68,30 +81,21 @@ if __name__ == '__main__':
         if ans == 'c':
             wallets = create_wallet(wallets)
 
-        # If the input is 'd' we need to delete a wallet
-        elif ans == 'd':
-            selection = raw_input("Which wallet would you like to delete?: ")
-            ans = raw_input("Are you sure you want to delete this wallet? It cannot be undone[y/n]: ")
-            if ans == 'n':
-                print "Deletion aborted"
-            elif ans == 'y':
-                name = wallets[guide[int(selection)]].name
-                print "Wallet to delete: " + name
-                proof = raw_input("Please type the name of the wallet to finalize decision [" + name + "]: ")
-                if proof == name:
-                    wallets.pop(name, None)
-                    shutil.rmtree('key-'+name)
-                else:
-                    print "Name improperly typed. Aborting!"
-
         # If the user selects a number, we should check if it is a valid selection
         elif ans != 'exit' and guide[int(ans)] in wallets.keys():
-            print "\033[H\033[J",  # Note the comma
             ians = ""
+            twallet = wallets[guide[int(ans)]]
             while ians != 'exit':
+                print "\033[H\033[J",  # Note the comma
                 print "\r(0) Display Address"  # \r is to clear that line
                 print "(1) Send Amount to Other Wallet"
-                twallet = wallets[guide[int(ans)]]
                 print "Balance: " + str(twallet.get_balance(twallet.get_address(), blockchain))
+                print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+                print "To delete this wallet please enter 'd' and hit [Enter]"
 
-                ians = raw_input(wallets[guide[int(ans)]].name+">> ")
+                ians = raw_input(twallet.name+">> ")
+
+                # If the input is 'd' we need to delete a wallet
+                if ians == 'd':
+                    delete_wallet(wallets, twallet)
+                    ians = 'exit'
