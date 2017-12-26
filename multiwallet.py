@@ -35,7 +35,8 @@ if __name__ == '__main__':
     ans = ""
     guide = {}
     while ans != 'exit':
-        print "Welcome to Specter Multi_Wallet V0.02"
+        print "\033[H\033[J",  # Note the comma
+        print "\rWelcome to Specter Multi_Wallet V0.02"  # \r is to clear that line
         print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
         print ""
         print "To begin, select a wallet listed below"
@@ -43,16 +44,17 @@ if __name__ == '__main__':
         for i, item in enumerate(wallets.keys()):
             guide[i] = item
             print "("+str(i)+") " + wallets[item].name
-        print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+        print ""
         print "To select a wallet please enter a number and hit [Enter]"
+        print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
         
         ans = raw_input(">> ")
 
         if ans!= 'exit' and guide[int(ans)] in wallets.keys():
-            print "\033[H\033[J\r"
+            print "\033[H\033[J",  # Note the comma
             ians = ""
             while ians != 'exit':
-                print "(0) Display Address"
+                print "\r(0) Display Address"  # \r is to clear that line
                 print "(1) Send Amount to Other Wallet"
                 twallet = wallets[guide[int(ans)]]
                 print "Balance: " + str(twallet.get_balance(twallet.get_address(), blockchain))
