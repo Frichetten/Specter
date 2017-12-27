@@ -34,7 +34,6 @@ class Blockchain:
                 print "Failed to connect to nodes. Terminating"
                 exit()
 
-    
     def download_blockchain(self, address_list):
         # Query the nodes for the blockchain
         # In the future validation will need to occur

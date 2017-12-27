@@ -1,7 +1,11 @@
 # Specter Wallet Implementation
 # Nicholas Frichette 12/8/2017
+
 import os
 import requests
+import time
+import json
+import hashlib
 
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
@@ -9,16 +13,15 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives.asymmetric import rsa
 
-from blockchain import *
-
 # ANSI escape sequences
 FAIL = '\033[91m'
 END = '\033[0m'
 OK = '\033[92m'
 
+
 class Wallet:
 
-    NODE_ADDRESS_LIST = ['http://localhost']
+    NODE_ADDRESS_LIST = ['http://localhost:5000']
 
     name = ""
     publicKey = ""
@@ -67,21 +70,65 @@ class Wallet:
             itself) should handle the blockcahin. """
 
         # Download the blockchain from localhost
-        #try:
+        # try:
         #    blockchain_json = self.download_blockchain(self.NODE_ADDRESS_LIST)
         #    self.blockchain = Blockchain.unjsonify(blockchain_json)
-        #except requests.exceptions.ConnectionError:
+        # except requests.exceptions.ConnectionError:
         #    print FAIL + 'Failed to connect to nodes. Terminating.' + END
         #    exit(1)
 
         # Now that we have the blockchain we need to determine our balance
-        #self.balance = self.get_balance(self.get_address())
+        # self.balance = self.get_balance(self.get_address())
 
-    def display_address_and_balance(self):
+    def broadcast_transaction(self, transaction):
+        data = {
+            "transaction": transaction
+        }
+
+        for node in self.NODE_ADDRESS_LIST:
+            try:
+                response = requests.post(node, data)
+            except requests.exceptions.RequestException:
+                print "Failed to contact node: " + node
+
+    def create_transaction(self, amount, to):
+        # First we need to generate a signature
+        signature = self.create_signable_transaction(
+            self.get_address(),
+            to,
+            amount,
+            time.time()
+        )
+
+        # Now that we have the signature, lets create the transaction
+        transaction = {
+            "from": self.get_address(),
+            "to": to,
+            "amount": amount,
+            "signature": unicode(self.sign_transaction(signature), errors='ignore'),
+            "timestamp": time.time(),
+            "hash": ""
+        }
+        transaction['hash'] = self.generate_transaction_hash(transaction)
+        return transaction
+
+    @staticmethod
+    def create_signable_transaction(from_address, to_address, amount, timestamp):
+        return ':'.join((from_address, to_address, amount, str(timestamp)))
+
+    def generate_transaction_hash(self, transaction):
+        data = transaction.copy()
+        data.pop('hash', None)
+        data_json = json.dumps(data, sort_keys=True)
+        hashed = hashlib.sha256(data_json)
+        return hashed.hexdigest()
+
+    def display_address_and_balance(self, blockchain):
         print "Wallet Address:", self.get_address()[:20] + "..."
-        print "Balance:", self.get_balance(self.get_address())
+        print "Balance:", self.get_balance(blockchain)
 
-    def get_balance(self, address, blockchain):
+    def get_balance(self, blockchain):
+        address = self.get_address()
         balance = 0
         for block in blockchain.blocks:
             if block.transaction['from'] == address:

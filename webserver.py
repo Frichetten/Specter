@@ -3,6 +3,7 @@
 
 from flask import Flask
 from flask import jsonify
+from flask import request
 
 from node import *
 from wallet import *
@@ -13,6 +14,12 @@ app = Flask(__name__)
 @app.route('/')
 def index():
     return "Hello"
+
+
+@app.route('/', methods=['POST'])
+def receive_tranactions():
+    print request.json
+    return "Received"
 
 
 @app.route('/getblockchain', methods=['GET'])

@@ -37,20 +37,40 @@ def delete_wallet(wallets, wallet_name):
 def specific_wallet_input(wallets, guide, index, blockchain):
     selection = ""
     selected_wallet = wallets[guide[int(index)]]
+    approved_input = ['0', '1', 'd']
     while selection != 'exit':
         print "\033[H\033[J",  # Note the comma
         print "\r(0) Display Address"  # \r is to clear that line
         print "(1) Send Amount to Other Wallet"
-        print "Balance: " + str(selected_wallet.get_balance(selected_wallet.get_address(), blockchain))
+        selected_wallet.display_address_and_balance(blockchain)
         print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
         print "To delete this wallet please enter 'd' and hit [Enter]"
 
         selection = raw_input(selected_wallet.name + ">> ")
 
-        # If the input is 'd' we need to delete a wallet
-        if selection == 'd':
-            delete_wallet(wallets, selected_wallet)
-            selection = 'exit'
+        # Validate input
+        if selection in approved_input:
+            # If the input is '0' we need to display the public address
+            if selection == '0':
+                print selected_wallet.get_address()
+                raw_input("Press [Enter] to continue...")
+
+            # If the input is '1' we need to send funds to a public address
+            if selection == '1':
+                to = raw_input("What is the public address of the wallet you'd like to send to?: ")
+                amount = raw_input("How much would you like to send? [Current funds: " +
+                                   str(selected_wallet.get_balance(blockchain)) + "]: ")
+                transaction = selected_wallet.create_transaction(amount, to)
+                selected_wallet.broadcast_transaction(transaction)
+                raw_input("Transaction Complete. Press [Enter] to continue...")
+
+            # If the input is 'd' we need to delete a wallet
+            if selection == 'd':
+                delete_wallet(wallets, selected_wallet)
+                selection = 'exit'
+
+        else:
+            None
 
 
 def main():
@@ -98,7 +118,6 @@ def main():
 
         # Validate input
         if ans in approved_input:
-
             # If the input is 'c' we need to create a new wallet
             if ans == 'c':
                 create_wallet(wallets)
