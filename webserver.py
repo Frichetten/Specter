@@ -10,6 +10,11 @@ from wallet import *
 
 app = Flask(__name__)
 
+# ANSI escape sequences
+FAIL = '\033[91m'
+END = '\033[0m'
+OK = '\033[92m'
+
 
 @app.route('/')
 def index():
