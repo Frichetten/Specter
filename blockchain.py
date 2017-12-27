@@ -80,6 +80,7 @@ class Blockchain:
         return None
 
     def print_chain(self):
+        print self.blocks
         return self.blocks
 
     def make_genesis_block(self):

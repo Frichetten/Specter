@@ -6,6 +6,7 @@ import requests
 import time
 import json
 import hashlib
+import base64
 
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
@@ -81,32 +82,31 @@ class Wallet:
         # self.balance = self.get_balance(self.get_address())
 
     def broadcast_transaction(self, transaction):
-        data = {
-            "transaction": transaction
-        }
-
         for node in self.NODE_ADDRESS_LIST:
             try:
-                response = requests.post(node, data)
+                response = requests.post(node, json=transaction)
             except requests.exceptions.RequestException:
                 print "Failed to contact node: " + node
 
     def create_transaction(self, amount, to):
+        timestamp = time.time()
         # First we need to generate a signature
         signature = self.create_signable_transaction(
             self.get_address(),
             to,
             amount,
-            time.time()
+            timestamp
         )
+        sig = self.sign_transaction(signature)
+        sig = base64.encodestring(sig)
 
         # Now that we have the signature, lets create the transaction
         transaction = {
             "from": self.get_address(),
             "to": to,
             "amount": amount,
-            "signature": unicode(self.sign_transaction(signature), errors='ignore'),
-            "timestamp": time.time(),
+            "signature": sig,
+            "timestamp": timestamp,
             "hash": ""
         }
         transaction['hash'] = self.generate_transaction_hash(transaction)
@@ -137,11 +137,59 @@ class Wallet:
                 balance += block.transaction['amount']
         return balance
 
+    def verify_remote_transaction(self, public_key, signature, transaction):
+        print "When verified"
+        # transaction.pop('hash')
+        transaction = self.create_signable_transaction(transaction['from'], transaction['to'], transaction['amount'], transaction['timestamp'])
+        print bytes(transaction)
+        with open('./temp.key', 'w') as f:
+            f.write("-----BEGIN PUBLIC KEY-----\n")
+            i = 0
+            while i < len(public_key):
+                f.write(public_key[i:i+64]+'\n')
+                i += 64
+            f.write("-----END PUBLIC KEY-----\n")
+
+        with open('temp.key', 'rb') as key:
+            public_key = serialization.load_pem_public_key(
+                key.read(),
+                backend=default_backend()
+            )
+
+        print "Is the remote public key the same as the local?"
+        # remote
+        remote_pem = public_key.public_bytes(
+            encoding=serialization.Encoding.PEM,
+            format=serialization.PublicFormat.SubjectPublicKeyInfo
+        )
+
+        #local
+        local_pem = self.publicKey.public_bytes(
+            encoding=serialization.Encoding.PEM,
+            format=serialization.PublicFormat.SubjectPublicKeyInfo
+        )
+        if remote_pem == local_pem:
+            print 'HECK YEAH!!'
+        print local_pem
+        print remote_pem
+
+        #verification = public_key.verify(
+        #    bytes(signature),
+        #    bytes(transaction),
+        #    padding.PSS(
+        #        mgf=padding.MGF1(hashes.SHA256()),
+        #        salt_length=padding.PSS.MAX_LENGTH
+        #    ),
+        #    hashes.SHA256()
+        #)
+        #return verification
+
     def get_address(self):
         address = self.serialize_public_key(self.publicKey)
         return ''.join(address.split('\n')[1:-2])
 
     def verify_transaction(self, signature, transaction):
+        # transaction.pop('hash')
         verification = self.publicKey.verify(
             signature,
             transaction,
@@ -154,6 +202,8 @@ class Wallet:
         return verification
 
     def sign_transaction(self, transaction):
+        print "When signed"
+        print bytes(transaction)
         signature = self.privateKey.sign(
             transaction,
             padding.PSS(

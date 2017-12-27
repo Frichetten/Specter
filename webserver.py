@@ -23,13 +23,26 @@ def index():
 
 @app.route('/', methods=['POST'])
 def receive_tranactions():
-    print request.json
-    return "Received"
+    transaction = request.get_json()
+
+    # We just received data from a wallet or node. We now need to
+    # package it into a block and add it to the blockchain. First
+    # We must validate it.
+    if validate_transaction(transaction):
+        return "Confirmation"
+    else:
+        return "Invalid"
 
 
 @app.route('/getblockchain', methods=['GET'])
 def getblockchain():
     return jsonify(blockchain.jsonify())
+
+
+def validate_transaction(transaction):
+    is_verified = wallet.verify_remote_transaction(transaction['from'], transaction['signature'], transaction)
+    print is_verified
+    return False
 
 
 if __name__ == '__main__':
