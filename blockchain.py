@@ -12,6 +12,11 @@ import requests
 
 from block import *
 
+# ANSI escape sequences
+FAIL = '\033[91m'
+END = '\033[0m'
+OK = '\033[92m'
+
 
 class Blockchain:
    
