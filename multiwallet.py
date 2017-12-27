@@ -7,38 +7,58 @@
     create more."""
 
 import shutil
-import copy
 
 from wallet import *
 from blockchain import *
 
 
-def create_wallet(wallet_dict):
+def create_wallet(wallets):
     wallet_name = raw_input("What would you like to name the wallet?: ")
     print "Creating " + wallet_name
-    return_wallet = copy.copy(wallet_dict)
-    return_wallet[wallet_name] = Wallet(wallet_name)
-    return return_wallet
+    wallets[wallet_name] = Wallet(wallet_name)
 
 
-def delete_wallet(wallet_dict, wallet_name):
-    yn = raw_input("Are you sure you want to delete this wallet? It cannot be undone[y/n]: ")
-    if yn == 'n':
+def delete_wallet(wallets, wallet_name):
+    answer = raw_input("Are you sure you want to delete this wallet? It cannot be undone[y/n]: ")
+    if answer == 'n':
         print "Deletion aborted"
-    elif yn == 'y':
+    elif answer == 'y':
         name = wallet_name.name
         print "Wallet to delete: " + name
         proof = raw_input("Please type the name of the wallet to finalize decision [" + name + "]: ")
         if proof == name:
-            wallet_dict.pop(name, None)
+            wallets.pop(name, None)
             shutil.rmtree('key-' + name)
+            raw_input("Wallet deleted! Press [Enter] to continue...")
         else:
             print "Name improperly typed. Aborting!"
+
+
+def specific_wallet_input(wallets, guide, index, blockchain):
+    selection = ""
+    selected_wallet = wallets[guide[int(index)]]
+    while selection != 'exit':
+        print "\033[H\033[J",  # Note the comma
+        print "\r(0) Display Address"  # \r is to clear that line
+        print "(1) Send Amount to Other Wallet"
+        print "Balance: " + str(selected_wallet.get_balance(selected_wallet.get_address(), blockchain))
+        print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+        print "To delete this wallet please enter 'd' and hit [Enter]"
+
+        selection = raw_input(selected_wallet.name + ">> ")
+
+        # If the input is 'd' we need to delete a wallet
+        if selection == 'd':
+            delete_wallet(wallets, selected_wallet)
+            selection = 'exit'
 
 
 def main():
     wallets = {}
     blockchain = Blockchain(is_node=False)
+
+    approved_input = ['c']
+    [approved_input.append(str(x)) for x in range(100)]
 
     # The convention for identifying wallets it having the public and
     # private keys in a local directory with the name key-"wallet name"
@@ -47,16 +67,16 @@ def main():
             wallets[item[item.index('-') + 1:]] = Wallet(item)
 
     # If there are no keys, then we need to offer the chance to make a wallet
+    ans = ""
     if len(wallets.keys()) == 0:
         ans = raw_input("We didn't find a wallet, would you like to create one? [y/n]: ")
         if ans == 'y':
-            wallets = create_wallet(wallets)
+            create_wallet(wallets)
         if ans == 'n':
             print "With no keys we'll have to exit. Goodbye"
             exit(0)
 
     """ Now that we've loaded the wallets, lets give the users some choices """
-    ans = ""
     guide = {}
     while ans != 'exit':
         print "\033[H\033[J",  # Note the comma
@@ -76,28 +96,18 @@ def main():
 
         ans = raw_input(">> ")
 
-        # If the input is 'c' we need to create a new wallet
-        if ans == 'c':
-            wallets = create_wallet(wallets)
+        # Validate input
+        if ans in approved_input:
 
-        # If the user selects a number, we should check if it is a valid selection
-        elif ans != 'exit' and guide[int(ans)] in wallets.keys():
-            ians = ""
-            twallet = wallets[guide[int(ans)]]
-            while ians != 'exit':
-                print "\033[H\033[J",  # Note the comma
-                print "\r(0) Display Address"  # \r is to clear that line
-                print "(1) Send Amount to Other Wallet"
-                print "Balance: " + str(twallet.get_balance(twallet.get_address(), blockchain))
-                print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-                print "To delete this wallet please enter 'd' and hit [Enter]"
+            # If the input is 'c' we need to create a new wallet
+            if ans == 'c':
+                create_wallet(wallets)
 
-                ians = raw_input(twallet.name + ">> ")
-
-                # If the input is 'd' we need to delete a wallet
-                if ians == 'd':
-                    delete_wallet(wallets, twallet)
-                    ians = 'exit'
+            # If the user selects a number, we should check if it is a valid selection
+            elif guide[int(ans)] in wallets.keys():
+                specific_wallet_input(wallets, guide, ans, blockchain)
+        else:
+            None
 
 
 if __name__ == '__main__':
