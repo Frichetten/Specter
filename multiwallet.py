@@ -17,7 +17,6 @@ END = '\033[0m'
 OK = '\033[92m'
 
 
-
 def create_wallet(wallets):
     wallet_name = raw_input("What would you like to name the wallet?: ")
     print "Creating " + wallet_name
