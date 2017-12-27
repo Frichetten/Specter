@@ -36,8 +36,7 @@ def delete_wallet(wallet_dict, wallet_name):
             print "Name improperly typed. Aborting!"
 
 
-if __name__ == '__main__':
-
+def main():
     wallets = {}
     blockchain = Blockchain(is_node=False)
 
@@ -45,7 +44,7 @@ if __name__ == '__main__':
     # private keys in a local directory with the name key-"wallet name"
     for item in os.listdir('.'):
         if 'key-' in item and 'nodekey' not in item:
-            wallets[item[item.index('-')+1:]] = Wallet(item)
+            wallets[item[item.index('-') + 1:]] = Wallet(item)
 
     # If there are no keys, then we need to offer the chance to make a wallet
     if len(wallets.keys()) == 0:
@@ -68,13 +67,13 @@ if __name__ == '__main__':
         print ""
         for i, item in enumerate(wallets.keys()):
             guide[i] = item
-            print "("+str(i)+") " + wallets[item].name
+            print "(" + str(i) + ") " + wallets[item].name
         print ""
         print "To select a wallet please enter a number and hit [Enter]"
         print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
         print "To create a wallet please enter 'c' and hit [Enter]"
         print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-        
+
         ans = raw_input(">> ")
 
         # If the input is 'c' we need to create a new wallet
@@ -93,9 +92,14 @@ if __name__ == '__main__':
                 print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
                 print "To delete this wallet please enter 'd' and hit [Enter]"
 
-                ians = raw_input(twallet.name+">> ")
+                ians = raw_input(twallet.name + ">> ")
 
                 # If the input is 'd' we need to delete a wallet
                 if ians == 'd':
                     delete_wallet(wallets, twallet)
                     ians = 'exit'
+
+
+if __name__ == '__main__':
+    main()
+
