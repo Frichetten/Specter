@@ -36,7 +36,7 @@ class Blockchain:
                 blockchain_json = self.download_blockchain(address_list)
                 self.unjsonify(blockchain_json)
             except requests.exceptions.ConnectionError:
-                print FAILED + "Failed to connect to nodes. Terminating" + END
+                print FAIL + "Failed to connect to nodes. Terminating" + END
                 exit()
 
     
