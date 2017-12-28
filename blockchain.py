@@ -21,6 +21,7 @@ OK = '\033[92m'
 class Blockchain:
    
     blocks = []
+    index = 0
 
     def __init__(self, is_node=False):
         if is_node:
@@ -83,6 +84,19 @@ class Blockchain:
         print self.blocks
         return self.blocks
 
+    def add_block(self, block):
+        self.blocks.append(block)
+
+    def make_block(self, transaction):
+        self.index += 1
+
+        # Error handling to fix serialization issues
+        transaction['amount'] = int(transaction['amount'])
+
+        block_hash = self.calc_block_hash(self.index, transaction['hash'], transaction['timestamp'], transaction, 0)
+        block = Block(self.index, transaction, transaction['hash'], block_hash, transaction['timestamp'], 0)
+        self.add_block(block)
+
     def make_genesis_block(self):
         print 'Genesis Block Created'
         transaction = {
@@ -106,6 +120,7 @@ class Blockchain:
         }
         current_hash = self.calc_block_hash(0, -1, -1, transaction, 0)
         genesis_block = Block(0, transaction, -1, current_hash, 0, 0)
+        self.index += 1
         return genesis_block
 
     def calc_block_hash(self, index, prev_hash, timestamp, transaction, nonce=0):
