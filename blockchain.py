@@ -27,7 +27,7 @@ class Blockchain:
     def __init__(self, is_node=False):
         if is_node:
             print OK + 'Thank you for standing up a node!' + END
-            print OK + 'No blocks in chain' + end
+            print FAIL + 'No blocks in chain' + END
             print OK + 'Creating Genesis Block' + END
             genesis = self.make_genesis_block()
             self.add_block(genesis)
