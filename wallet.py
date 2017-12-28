@@ -13,6 +13,7 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptography.exceptions import InvalidSignature
 
 # ANSI escape sequences
 FAIL = '\033[91m'
@@ -138,10 +139,9 @@ class Wallet:
         return balance
 
     def verify_remote_transaction(self, public_key, signature, transaction):
-        print "When verified"
         # transaction.pop('hash')
         transaction = self.create_signable_transaction(transaction['from'], transaction['to'], transaction['amount'], transaction['timestamp'])
-        print bytes(transaction)
+        # print bytes(base64.decodestring(signature))
         with open('./temp.key', 'w') as f:
             f.write("-----BEGIN PUBLIC KEY-----\n")
             i = 0
@@ -156,33 +156,19 @@ class Wallet:
                 backend=default_backend()
             )
 
-        print "Is the remote public key the same as the local?"
-        # remote
-        remote_pem = public_key.public_bytes(
-            encoding=serialization.Encoding.PEM,
-            format=serialization.PublicFormat.SubjectPublicKeyInfo
-        )
-
-        #local
-        local_pem = self.publicKey.public_bytes(
-            encoding=serialization.Encoding.PEM,
-            format=serialization.PublicFormat.SubjectPublicKeyInfo
-        )
-        if remote_pem == local_pem:
-            print 'HECK YEAH!!'
-        print local_pem
-        print remote_pem
-
-        #verification = public_key.verify(
-        #    bytes(signature),
-        #    bytes(transaction),
-        #    padding.PSS(
-        #        mgf=padding.MGF1(hashes.SHA256()),
-        #        salt_length=padding.PSS.MAX_LENGTH
-        #    ),
-        #    hashes.SHA256()
-        #)
-        #return verification
+        try:
+            verification = public_key.verify(
+                bytes(base64.decodestring(signature)),
+                bytes(transaction),
+                padding.PSS(
+                    mgf=padding.MGF1(hashes.SHA256()),
+                    salt_length=padding.PSS.MAX_LENGTH
+                ),
+                hashes.SHA256()
+            )
+            return True
+        except InvalidSignature:
+            return False
 
     def get_address(self):
         address = self.serialize_public_key(self.publicKey)
@@ -202,8 +188,8 @@ class Wallet:
         return verification
 
     def sign_transaction(self, transaction):
-        print "When signed"
-        print bytes(transaction)
+        # print "When signed"
+        # print bytes(transaction)
         signature = self.privateKey.sign(
             transaction,
             padding.PSS(
@@ -212,6 +198,7 @@ class Wallet:
             ),
             hashes.SHA256()
         )
+        # print signature
         return signature
 
     def load_key(self, name):

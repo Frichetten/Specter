@@ -41,8 +41,7 @@ def getblockchain():
 
 def validate_transaction(transaction):
     is_verified = wallet.verify_remote_transaction(transaction['from'], transaction['signature'], transaction)
-    print is_verified
-    return False
+    return is_verified
 
 
 if __name__ == '__main__':
