@@ -67,6 +67,7 @@ def specific_wallet_input(wallets, guide, index, blockchain):
                                    str(selected_wallet.get_balance(blockchain)) + "]: ")
                 transaction = selected_wallet.create_transaction(amount, to)
                 selected_wallet.broadcast_transaction(transaction)
+                blockchain.update_blockchain()
                 raw_input("Transaction Complete. Press [Enter] to continue...")
 
             # If the input is 'd' we need to delete a wallet

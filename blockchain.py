@@ -22,6 +22,7 @@ class Blockchain:
    
     blocks = []
     index = 0
+    address_list = ['http://localhost']
 
     def __init__(self, is_node=False):
         if is_node:
@@ -32,9 +33,8 @@ class Blockchain:
             self.add_block(genesis)
         else:
             # This is an implementation meant for normal users
-            address_list = ['http://localhost']
             try:
-                blockchain_json = self.download_blockchain(address_list)
+                blockchain_json = self.download_blockchain(self.address_list)
                 self.unjsonify(blockchain_json)
             except requests.exceptions.ConnectionError:
                 print "Failed to connect to nodes. Terminating"
@@ -44,10 +44,17 @@ class Blockchain:
         # Query the nodes for the blockchain
         # In the future validation will need to occur
         blockchain_json = []
-        for address in address_list:
+        for address in self.address_list:
             request = requests.get(address + ':5000/getblockchain')
             blockchain_json = request.json()
         return blockchain_json
+
+    def update_blockchain(self):
+        try:
+            blockchain_json = self.download_blockchain(self.address_list)
+            self.unjsonify(blockchain_json)
+        except requests.exceptions.ConnectionError:
+            print "Failed to update blockchain"
 
     def jsonify(self):
         data_json = {}
