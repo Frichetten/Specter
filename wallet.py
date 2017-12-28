@@ -147,7 +147,7 @@ class Wallet:
             key_size=4096,
             backend=default_backend()
         )
-        print OK '\033[92m' + 'Generated Private Key' + '\033[92m' END
+        print OK + 'Generated Private Key' + END
         return private_key
 
     def serialize_private_key(self, private_key):
@@ -164,6 +164,7 @@ class Wallet:
             encoding=serialization.Encoding.PEM,
             format=serialization.PublicFormat.SubjectPublicKeyInfo
         )
+        print OK + 'serialized Public Key' + END
         return public_pem
 
     def find_keys(self, wallet_name):
