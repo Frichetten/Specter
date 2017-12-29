@@ -19,24 +19,24 @@ OK = '\033[92m'
 
 def create_wallet(wallets):
     wallet_name = raw_input("What would you like to name the wallet?: ")
-    print "Creating " + wallet_name
+    print OK + "Creating " + wallet_name +END
     wallets[wallet_name] = Wallet(wallet_name)
 
 
 def delete_wallet(wallets, wallet_name):
     answer = raw_input("Are you sure you want to delete this wallet? It cannot be undone[y/n]: ")
     if answer == 'n':
-        print "Deletion aborted"
+        print FAIL + "Deletion aborted" + END
     elif answer == 'y':
         name = wallet_name.name
-        print "Wallet to delete: " + name
+        print FAIL + "Wallet to delete: " + name + END
         proof = raw_input("Please type the name of the wallet to finalize decision [" + name + "]: ")
         if proof == name:
             wallets.pop(name, None)
             shutil.rmtree('key-' + name)
             raw_input("Wallet deleted! Press [Enter] to continue...")
         else:
-            print "Name improperly typed. Aborting!"
+            print FAIL + "Name improperly typed. Aborting!" + END
 
 
 def specific_wallet_input(wallets, guide, index, blockchain):
@@ -99,7 +99,7 @@ def main():
         if ans == 'y':
             create_wallet(wallets)
         if ans == 'n':
-            print "With no keys we'll have to exit. Goodbye"
+            print FAIL + "With no keys we'll have to exit. Goodbye" + END
             exit(0)
 
     """ Now that we've loaded the wallets, lets give the users some choices """
