@@ -24,9 +24,9 @@ class Blockchain:
 
     def __init__(self, is_node=False):
         if is_node:
-            print 'Thank you for standing up a node!'
-            print 'No blocks in chain'
-            print 'Creating Genesis Block'
+            print OK + 'Thank you for standing up a node!' + END
+            print FAIL + 'No blocks in chain' + END
+            print OK + 'Creating Genesis Block' + END
             genesis = self.make_genesis_block()
             self.add_block(genesis)
         else:
@@ -36,7 +36,7 @@ class Blockchain:
                 blockchain_json = self.download_blockchain(address_list)
                 self.unjsonify(blockchain_json)
             except requests.exceptions.ConnectionError:
-                print "Failed to connect to nodes. Terminating"
+                print FAIL + 'Failed to connect to nodes. Terminating' + END
                 exit()
 
     def download_blockchain(self, address_list):
@@ -84,7 +84,7 @@ class Blockchain:
         return self.blocks
 
     def make_genesis_block(self):
-        print 'Genesis Block Created'
+        print OK + 'Genesis Block Created' + END
         transaction = {
             "from": "-1",
             "to": "MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAupSwIG17vricebp6EN88"+ 
