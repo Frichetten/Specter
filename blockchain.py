@@ -105,7 +105,7 @@ class Blockchain:
         self.add_block(block)
 
     def make_genesis_block(self):
-        print 'Genesis Block Created'
+        print OK + 'Genesis Block Created' + END
         transaction = {
             "from": "-1",
             "to": "MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAupSwIG17vricebp6EN88"+ 

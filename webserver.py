@@ -64,7 +64,7 @@ if __name__ == '__main__':
 
     if wallet is None:
         print FAIL + 'No wallet detected. Let\'s generate one' + END
-        print "Creating nodekey"
+        print OK + "Creating nodekey" + END
         wallet = Wallet('nodekey')
 
     print wallet.get_address()
