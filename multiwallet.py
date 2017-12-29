@@ -19,7 +19,7 @@ OK = '\033[92m'
 
 def create_wallet(wallets):
     wallet_name = raw_input("What would you like to name the wallet?: ")
-    print "Creating " + wallet_name
+    print OK + "Creating " + wallet_name +END
     wallets[wallet_name] = Wallet(wallet_name)
 
 
@@ -29,7 +29,7 @@ def delete_wallet(wallets, wallet_name):
         print FAIL + "Deletion aborted" + END
     elif answer == 'y':
         name = wallet_name.name
-        print "Wallet to delete: " + name
+        print FAIL + "Wallet to delete: " + name + END
         proof = raw_input("Please type the name of the wallet to finalize decision [" + name + "]: ")
         if proof == name:
             wallets.pop(name, None)
@@ -67,6 +67,7 @@ def specific_wallet_input(wallets, guide, index, blockchain):
                                    str(selected_wallet.get_balance(blockchain)) + "]: ")
                 transaction = selected_wallet.create_transaction(amount, to)
                 selected_wallet.broadcast_transaction(transaction)
+                blockchain.update_blockchain()
                 raw_input("Transaction Complete. Press [Enter] to continue...")
 
             # If the input is 'd' we need to delete a wallet

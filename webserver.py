@@ -29,6 +29,8 @@ def receive_tranactions():
     # package it into a block and add it to the blockchain. First
     # We must validate it.
     if validate_transaction(transaction):
+        print OK + "Valid Transaction Received" +END
+        blockchain.make_block(transaction)
         return "Confirmation"
     else:
         return "Invalid"

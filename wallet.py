@@ -87,7 +87,7 @@ class Wallet:
             try:
                 response = requests.post(node, json=transaction)
             except requests.exceptions.RequestException:
-                print "Failed to contact node: " + node
+                print FAIL + "Failed to contact node: " + node + END
 
     def create_transaction(self, amount, to):
         timestamp = time.time()
@@ -248,6 +248,7 @@ class Wallet:
             encoding=serialization.Encoding.PEM,
             format=serialization.PublicFormat.SubjectPublicKeyInfo
         )
+        print OK + 'serialized Public Key' + END
         return public_pem
 
     def find_keys(self, wallet_name):
