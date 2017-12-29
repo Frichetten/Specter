@@ -29,7 +29,7 @@ def receive_tranactions():
     # package it into a block and add it to the blockchain. First
     # We must validate it.
     if validate_transaction(transaction):
-        print "Valid Transaction Received"
+        print OK + "Valid Transaction Received" +END
         blockchain.make_block(transaction)
         return "Confirmation"
     else:
@@ -63,7 +63,7 @@ if __name__ == '__main__':
             wallet = Wallet(item)
 
     if wallet is None:
-        print 'No wallet detected. Let\'s generate one'
+        print FAIL + 'No wallet detected. Let\'s generate one' + END
         print "Creating nodekey"
         wallet = Wallet('nodekey')
 
