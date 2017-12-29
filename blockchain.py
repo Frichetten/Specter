@@ -21,33 +21,40 @@ OK = '\033[92m'
 class Blockchain:
    
     blocks = []
+    index = 0
+    address_list = ['http://localhost']
 
     def __init__(self, is_node=False):
         if is_node:
             print OK + 'Thank you for standing up a node!' + END
-            print OK + 'No blocks in chain' + end
+            print FAIL + 'No blocks in chain' + END
             print OK + 'Creating Genesis Block' + END
             genesis = self.make_genesis_block()
             self.add_block(genesis)
         else:
             # This is an implementation meant for normal users
-            address_list = ['http://localhost']
             try:
-                blockchain_json = self.download_blockchain(address_list)
+                blockchain_json = self.download_blockchain(self.address_list)
                 self.unjsonify(blockchain_json)
             except requests.exceptions.ConnectionError:
                 print FAIL + "Failed to connect to nodes. Terminating" + END
                 exit()
 
-    
     def download_blockchain(self, address_list):
         # Query the nodes for the blockchain
         # In the future validation will need to occur
         blockchain_json = []
-        for address in address_list:
+        for address in self.address_list:
             request = requests.get(address + ':5000/getblockchain')
             blockchain_json = request.json()
         return blockchain_json
+
+    def update_blockchain(self):
+        try:
+            blockchain_json = self.download_blockchain(self.address_list)
+            self.unjsonify(blockchain_json)
+        except requests.exceptions.ConnectionError:
+            print "Failed to update blockchain"
 
     def jsonify(self):
         data_json = {}
@@ -81,7 +88,21 @@ class Blockchain:
         return None
 
     def print_chain(self):
+        print self.blocks
         return self.blocks
+
+    def add_block(self, block):
+        self.blocks.append(block)
+
+    def make_block(self, transaction):
+        self.index += 1
+
+        # Error handling to fix serialization issues
+        transaction['amount'] = int(transaction['amount'])
+
+        block_hash = self.calc_block_hash(self.index, transaction['hash'], transaction['timestamp'], transaction, 0)
+        block = Block(self.index, transaction, transaction['hash'], block_hash, transaction['timestamp'], 0)
+        self.add_block(block)
 
     def make_genesis_block(self):
         print 'Genesis Block Created'
@@ -106,6 +127,7 @@ class Blockchain:
         }
         current_hash = self.calc_block_hash(0, -1, -1, transaction, 0)
         genesis_block = Block(0, transaction, -1, current_hash, 0, 0)
+        self.index += 1
         return genesis_block
 
     def calc_block_hash(self, index, prev_hash, timestamp, transaction, nonce=0):

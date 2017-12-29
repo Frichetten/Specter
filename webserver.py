@@ -3,11 +3,17 @@
 
 from flask import Flask
 from flask import jsonify
+from flask import request
 
 from node import *
 from wallet import *
 
 app = Flask(__name__)
+
+# ANSI escape sequences
+FAIL = '\033[91m'
+END = '\033[0m'
+OK = '\033[92m'
 
 
 @app.route('/')
@@ -15,9 +21,29 @@ def index():
     return "Hello"
 
 
+@app.route('/', methods=['POST'])
+def receive_tranactions():
+    transaction = request.get_json()
+
+    # We just received data from a wallet or node. We now need to
+    # package it into a block and add it to the blockchain. First
+    # We must validate it.
+    if validate_transaction(transaction):
+        print "Valid Transaction Received"
+        blockchain.make_block(transaction)
+        return "Confirmation"
+    else:
+        return "Invalid"
+
+
 @app.route('/getblockchain', methods=['GET'])
 def getblockchain():
     return jsonify(blockchain.jsonify())
+
+
+def validate_transaction(transaction):
+    is_verified = wallet.verify_remote_transaction(transaction['from'], transaction['signature'], transaction)
+    return is_verified
 
 
 if __name__ == '__main__':
