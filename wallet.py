@@ -248,7 +248,6 @@ class Wallet:
             encoding=serialization.Encoding.PEM,
             format=serialization.PublicFormat.SubjectPublicKeyInfo
         )
-        print OK + 'serialized Public Key' + END
         return public_pem
 
     def find_keys(self, wallet_name):
