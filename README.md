@@ -5,7 +5,9 @@
 </p>
 
 ### What is Specter?
-Specter is a prototype cryptocurrency designed to help people learn about Blockchain Technology. It is entirely open source and is developed using Python 2.7
+Specter is a prototype cryptocurrency designed to help people learn about Blockchain Technology. It is entirely open source and is developed using Python 2.7.
+
+Python 3 will be supported likely after a Version 1.0 is developed. A Python 3 branch is already setup.
 
 **What makes Specter unique as a cryptocurrency?:** Unlike most cryptocurrencies, Specter isn't trying to become an ICO or get sold on an exchange. Instead, Specter is a research project focused on overcoming the technical challenges of Blockchain technology.
 
