@@ -80,11 +80,17 @@ def specific_wallet_input(wallets, guide, index, blockchain):
             None
 
 
+def lookup_wallet(local_blockchain, address):
+    # Given an address let's find the balance of that wallet
+    balance = local_blockchain.lookup_address(address)
+    return balance
+
+
 def main():
     wallets = {}
-    blockchain = Blockchain(is_node=False)
+    local_blockchain = Blockchain(is_node=False)
 
-    approved_input = ['c']
+    approved_input = ['c', 'i']
     [approved_input.append(str(x)) for x in range(100)]
 
     # The convention for identifying wallets it having the public and
@@ -120,6 +126,8 @@ def main():
         print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
         print "To create a wallet please enter 'c' and hit [Enter]"
         print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+        print "To see the balance of any wallet with a public address please enter 'i' and hit [Enter]"
+        print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
         ans = raw_input(">> ")
 
@@ -129,9 +137,16 @@ def main():
             if ans == 'c':
                 create_wallet(wallets)
 
+            # If the input is 'i' we need to get information on a wallet
+            elif ans == 'i':
+                address = raw_input("Please enter the public address of the wallet: ")
+                balance = lookup_wallet(local_blockchain, address)
+                print "Balance: " + str(balance)
+                raw_input("Press [Enter] to continue...")
+
             # If the user selects a number, we should check if it is a valid selection
             elif guide[int(ans)] in wallets.keys():
-                specific_wallet_input(wallets, guide, ans, blockchain)
+                specific_wallet_input(wallets, guide, ans, local_blockchain)
         else:
             None
 

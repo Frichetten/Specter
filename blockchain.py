@@ -146,6 +146,16 @@ class Blockchain:
     def add_block(self, block):
         self.blocks.append(block)
 
+    def lookup_address(self, address):
+        # Begin searching for transactions from that address
+        balance = 0
+        for block in self.blocks:
+            if block.transaction['from'] == address:
+                balance -= block.transaction['amount']
+            if block.transaction['to'] == address:
+                balance += block.transaction['amount']
+        return balance
+
 
 if __name__ == '__main__':
     blockchain = Blockchain()

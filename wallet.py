@@ -140,7 +140,13 @@ class Wallet:
 
     def verify_remote_transaction(self, public_key, signature, transaction):
         # transaction.pop('hash')
-        transaction = self.create_signable_transaction(transaction['from'], transaction['to'], transaction['amount'], transaction['timestamp'])
+        transaction = self.create_signable_transaction(
+            transaction['from'],
+            transaction['to'],
+            transaction['amount'],
+            transaction['timestamp']
+        )
+
         # print bytes(base64.decodestring(signature))
         with open('./temp.key', 'w') as f:
             f.write("-----BEGIN PUBLIC KEY-----\n")
