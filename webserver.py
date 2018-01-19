@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # Specter Node
 # Nick Frichette 12/9/2017
 

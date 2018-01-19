@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # Specter MultiWallet Implementation
 # Nick Frichette 12/10/2017
 
