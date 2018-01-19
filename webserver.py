@@ -5,6 +5,7 @@
 from flask import Flask
 from flask import jsonify
 from flask import request
+from flask import render_template
 
 from node import *
 from wallet import *
@@ -19,7 +20,7 @@ OK = '\033[92m'
 
 @app.route('/')
 def index():
-    return "Hello"
+    return render_template("index.html")
 
 
 @app.route('/', methods=['POST'])
