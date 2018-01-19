@@ -52,6 +52,7 @@ class Blockchain:
     def update_blockchain(self):
         try:
             blockchain_json = self.download_blockchain(self.address_list)
+            self.blocks = []
             self.unjsonify(blockchain_json)
         except requests.exceptions.ConnectionError:
             print "Failed to update blockchain"
