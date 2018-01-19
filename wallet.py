@@ -147,23 +147,20 @@ class Wallet:
             transaction['timestamp']
         )
 
-        # print bytes(base64.decodestring(signature))
-        with open('./temp.key', 'w') as f:
-            f.write("-----BEGIN PUBLIC KEY-----\n")
-            i = 0
-            while i < len(public_key):
-                f.write(public_key[i:i+64]+'\n')
-                i += 64
-            f.write("-----END PUBLIC KEY-----\n")
+        key = "-----BEGIN PUBLIC KEY-----\n"
+        i = 0
+        while i < len(public_key):
+            key += public_key[i:i+64]+'\n'
+            i += 64
+        key += "-----END PUBLIC KEY-----\n"
 
-        with open('temp.key', 'rb') as key:
-            public_key = serialization.load_pem_public_key(
-                key.read(),
-                backend=default_backend()
-            )
+        public_key = serialization.load_pem_public_key(
+            str(key),
+            backend=default_backend()
+        )
 
         try:
-            verification = public_key.verify(
+            public_key.verify(
                 bytes(base64.decodestring(signature)),
                 bytes(transaction),
                 padding.PSS(
