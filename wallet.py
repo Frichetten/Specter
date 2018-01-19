@@ -86,6 +86,15 @@ class Wallet:
         for node in self.NODE_ADDRESS_LIST:
             try:
                 response = requests.post(node, json=transaction)
+
+                # Check the validation
+                if response.text == "Confirmation":
+                    # Transaction was validated
+                    return True
+                else:
+                    # Transaction was invalid
+                    return False
+
             except requests.exceptions.RequestException:
                 print FAIL + "Failed to contact node: " + node + END
 

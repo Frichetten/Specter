@@ -67,9 +67,14 @@ def specific_wallet_input(wallets, guide, index, blockchain):
                 amount = raw_input("How much would you like to send? [Current funds: " +
                                    str(selected_wallet.get_balance(blockchain)) + "]: ")
                 transaction = selected_wallet.create_transaction(amount, to)
-                selected_wallet.broadcast_transaction(transaction)
-                blockchain.update_blockchain()
-                raw_input("Transaction Complete. Press [Enter] to continue...")
+                validation = selected_wallet.broadcast_transaction(transaction)
+
+                if validation:
+                    print "Transaction was successful. Updating Blockchain"
+                    blockchain.update_blockchain()
+                    raw_input("Transaction Complete. Press [Enter] to continue...")
+                else:
+                    raw_input("Transcation Was Invalid. Press [Enter] to continue...")
 
             # If the input is 'd' we need to delete a wallet
             if selection == 'd':

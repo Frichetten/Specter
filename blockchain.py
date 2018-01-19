@@ -156,6 +156,21 @@ class Blockchain:
                 balance += block.transaction['amount']
         return balance
 
+    def validate_transaction(self, transaction):
+        # We need to ensure that a transaction is valid on the blockchain
+        # First lets get the amount the user wants to move
+        amount = int(transaction['amount'])
+
+        # Now let's check their balance with their public key
+        balance = self.lookup_address(transaction['from'])
+
+        # Now compare the two
+        if amount < balance:
+            return True
+        else:
+            return False
+
+
 
 if __name__ == '__main__':
     blockchain = Blockchain()
