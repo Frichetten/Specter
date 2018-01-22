@@ -2,6 +2,8 @@
 # Specter Node
 # Nick Frichette 12/9/2017
 
+import argparse
+
 from flask import Flask
 from flask import jsonify
 from flask import request
@@ -55,6 +57,11 @@ def validate_transaction(transaction):
 
 
 if __name__ == '__main__':
+    # Take in CLI Arguments
+    parser = argparse.ArgumentParser(description="Node and Web Server for Specter")
+    parser.add_argument('-p', help="Run the Web Server on a non-standard port", type=int, default=5000)
+    args = parser.parse_args()
+
     # Spawn our own node and get blockchain
     node = Node()
     blockchain = node.blockchain
@@ -77,5 +84,5 @@ if __name__ == '__main__':
 
     print wallet.get_address()
 
-    app.run()
+    app.run(host='0.0.0.0', port=args.p)
 
