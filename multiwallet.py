@@ -117,8 +117,8 @@ def main():
     """ Now that we've loaded the wallets, lets give the users some choices """
     guide = {}
     while ans != 'exit':
-        print "\033[H\033[J",  # Note the comma
-        print "\rWelcome to Specter Multi_Wallet V0.02"  # \r is to clear that line
+        print "\033[H\033[J\r",  # Note the comma
+        print "Welcome to Specter Multi_Wallet V0.02"  # \r is to clear that line
         print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
         print ""
         print "To begin, select a wallet listed below"

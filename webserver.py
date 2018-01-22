@@ -51,18 +51,38 @@ def authenticate_transaction(transaction):
     is_verified = wallet.verify_remote_transaction(transaction['from'], transaction['signature'], transaction)
     return is_verified
 
+
 def validate_transaction(transaction):
     is_validated = blockchain.validate_transaction(transaction)
     return is_validated
 
 
+def print_ascii():
+    print " _______  _______  _______  _______ _________ _______  _______      __________    _______"
+    print "(  ____ \(  ____ )(  ____ \(  ____ \\\__   __/(  ____ \(  ____ )    /  _    _  \\  /       \\"
+    print "| (    \/| (    )|| (    \/| (    \/   ) (   | (    \/| (    )|    | |_|  |_| |  |  BOO  |"
+    print "| (_____ | (____)|| (__    | |         | |   | (__    | (____)|    |          |  |  _____/"
+    print "(_____  )|  _____)|  __)   | |         | |   |  __)   |     __)    |    __    |  / /"
+    print "      ) || (      | (      | |         | |   | (      | (\ (       |   (__)   |   "
+    print "/\____) || )      | (____/\| (____/\   | |   | (____/\| ) \ \__    |          |   "
+    print "\_______)|/       (_______/(_______/   )_(   (_______/|/   \__/    |/\\/\\/\\/\\/\\|   "
+
+
 if __name__ == '__main__':
     # Take in CLI Arguments
     parser = argparse.ArgumentParser(description="Node and Web Server for Specter")
-    parser.add_argument('-p', help="Run the Web Server on a non-standard port", type=int, default=5000)
+    parser.add_argument('-p',
+                        metavar='Port Number',
+                        help="Run the Web Server on a non-standard port",
+                        type=int,
+                        default=5000)
     args = parser.parse_args()
 
-    # Spawn our own node and get blockchain
+    # Print some pretty art
+    print "\033[H\033[J\r",
+    print_ascii()
+
+    # Spawn out own node and get blockchain
     node = Node()
     blockchain = node.blockchain
     wallet = None
@@ -82,7 +102,7 @@ if __name__ == '__main__':
         print OK + "Creating nodekey" + END
         wallet = Wallet('nodekey')
 
-    print wallet.get_address()
+    print "Node Wallet Address: " + wallet.get_address()
 
     app.run(host='0.0.0.0', port=args.p)
 
