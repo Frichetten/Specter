@@ -46,8 +46,8 @@ class Blockchain:
                 blocks = self.db.get_all_blocks()
                 for item in blocks:
                     block = Block(
-                        item.indx,
-                        json.loads(item.transact),
+                        item.coin_index,
+                        json.loads(item.transaction_info),
                         item.previous_hash,
                         item.current_hash,
                         item.timestamp,
@@ -86,8 +86,8 @@ class Blockchain:
         i = 0
         for block in self.blocks:
             data = {
-                "index": block.index,
-                "transaction": block.transaction,
+                "index": block.coin_index,
+                "transaction": block.transaction_info,
                 "previous_hash": block.previous_hash,
                 "current_hash": block.current_hash,
                 "timestamp": block.timestamp,
@@ -178,10 +178,10 @@ class Blockchain:
         # Begin searching for transactions from that address
         balance = 0
         for block in self.blocks:
-            if block.transaction['from'] == address:
-                balance -= block.transaction['amount']
-            if block.transaction['to'] == address:
-                balance += block.transaction['amount']
+            if block.transaction_info['from'] == address:
+                balance -= block.transaction_info['amount']
+            if block.transaction_info['to'] == address:
+                balance += block.transaction_info['amount']
         return balance
 
     def validate_transaction(self, transaction):

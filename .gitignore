@@ -13,4 +13,4 @@ key-*
 
 # Ignore the Database #
 #######################
-./blockchain_db
+blockchain_db
