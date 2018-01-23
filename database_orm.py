@@ -8,17 +8,8 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import *
 from sqlalchemy import create_engine, exists
 
-Base = declarative_base()
-
-
-class Blocks(Base):
-    __tablename__ = "blocks"
-    indx = Column(Integer, primary_key=True)
-    transact = Column(String(10000), nullable=False)
-    previous_hash = Column(String(250), nullable=False)
-    current_hash = Column(String(250), nullable=False)
-    timestamp = Column(String(250), nullable=False)
-    nonce = Column(String(250), nullable=False)
+from base import Base
+from block import *
 
 
 class Database:
@@ -32,26 +23,26 @@ class Database:
         self.session = db_session()
 
     def insert_block(self, block):
-        sql_block = Blocks(
-            indx=block.index,
-            transact=json.dumps(block.transaction),
-            previous_hash=block.previous_hash,
-            current_hash=block.current_hash,
-            timestamp=block.timestamp,
-            nonce=block.nonce
+        sql_block = Block(
+            block.coin_index,
+            json.dumps(block.transaction_info),
+            block.previous_hash,
+            block.current_hash,
+            block.timestamp,
+            block.nonce
         )
         self.session.add(sql_block)
         self.session.commit()
 
     def get_all_blocks(self):
-        return self.session.query(Blocks).all()
+        return self.session.query(Block).all()
 
     def in_db(self, block):
-        (ret, ) = self.session.query(exists().where(Blocks.indx == block.index))
+        (ret, ) = self.session.query(exists().where(Block.coin_index == block.coin_index))
         return ret[0]
 
     def is_empty(self):
-        ret = self.session.query(Blocks).count()
+        ret = self.session.query(Block).count()
         if ret == 0:
             return True
         else:

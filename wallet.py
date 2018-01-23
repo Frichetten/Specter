@@ -141,10 +141,10 @@ class Wallet:
         address = self.get_address()
         balance = 0
         for block in blockchain.blocks:
-            if block.transaction['from'] == address:
-                balance -= block.transaction['amount']
-            if block.transaction['to'] == address:
-                balance += block.transaction['amount']
+            if block.transaction_info['from'] == address:
+                balance -= block.transaction_info['amount']
+            if block.transaction_info['to'] == address:
+                balance += block.transaction_info['amount']
         return balance
 
     def verify_remote_transaction(self, public_key, signature, transaction):
