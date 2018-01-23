@@ -1,4 +1,6 @@
-import os
+# Specter BlockChain Implementation
+# Nick Frichette 1/23/2017
+
 import json
 
 from sqlalchemy import Column, ForeignKey, Integer, String
