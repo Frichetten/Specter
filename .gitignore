@@ -10,3 +10,7 @@ key-*
 # Ignore PyCharm Configs #
 ##########################
 ./.idea/*
+
+# Ignore the Database #
+#######################
+./blockchain_db
