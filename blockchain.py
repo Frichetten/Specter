@@ -11,6 +11,7 @@ import requests
 
 
 from block import *
+from database_orm import *
 
 # ANSI escape sequences
 FAIL = '\033[91m'
@@ -23,8 +24,13 @@ class Blockchain:
     blocks = []
     index = 0
     address_list = ['http://localhost']
+    db = None
 
     def __init__(self, is_node=False):
+
+        # Instantiate DB
+        self.db = Database()
+
         if is_node:
             print OK + 'Thank you for standing up a node!' + END
             print FAIL + 'No blocks in chain' + END
@@ -74,7 +80,6 @@ class Blockchain:
         return data_json
 
     def unjsonify(self, json_data):
-        blockc = None
         for block in json_data:
             js = json_data[block]
             block = Block(
@@ -86,6 +91,11 @@ class Blockchain:
                 js['nonce']
             )
             self.blocks.append(block)
+
+            # If not in the DB, insert it
+            if not self.db.in_db(block):
+                self.db.insert_block(block)
+
         return None
 
     def print_chain(self):
