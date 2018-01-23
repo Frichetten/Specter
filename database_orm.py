@@ -41,6 +41,16 @@ class Database:
         self.session.add(sql_block)
         self.session.commit()
 
+    def get_all_blocks(self):
+        return self.session.query(Blocks).all()
+
     def in_db(self, block):
         (ret, ) = self.session.query(exists().where(Blocks.indx == block.index))
         return ret[0]
+
+    def is_empty(self):
+        ret = self.session.query(Blocks).count()
+        if ret == 0:
+            return True
+        else:
+            return False

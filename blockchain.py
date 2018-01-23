@@ -33,10 +33,28 @@ class Blockchain:
 
         if is_node:
             print OK + 'Thank you for standing up a node!' + END
-            print FAIL + 'No blocks in chain' + END
-            print OK + 'Creating Genesis Block' + END
-            genesis = self.make_genesis_block()
-            self.add_block(genesis)
+
+            # If the DB is empty, generate the Genesis
+            if self.db.is_empty():
+                print FAIL + 'No blocks in chain' + END
+                print OK + 'Creating Genesis Block' + END
+                genesis = self.make_genesis_block()
+                self.add_block(genesis)
+                self.db.insert_block(genesis)
+            else:
+                # For each row in the DB, create a block
+                blocks = self.db.get_all_blocks()
+                for item in blocks:
+                    block = Block(
+                        item.indx,
+                        json.loads(item.transact),
+                        item.previous_hash,
+                        item.current_hash,
+                        item.timestamp,
+                        item.nonce
+                    )
+                    self.add_block(block)
+
         else:
             # This is an implementation meant for normal users
             try:
