@@ -20,16 +20,16 @@ OK = '\033[92m'
 
 def create_wallet(wallets):
     wallet_name = raw_input("What would you like to name the wallet?: ")
-    print OK + "Creating " + wallet_name +END
+    print OK + "Creating " + wallet_name + END
     wallets[wallet_name] = Wallet(wallet_name)
 
 
 def delete_wallet(wallets, wallet_name):
     answer = raw_input("Are you sure you want to delete this wallet? It cannot be undone[y/n]: ")
-    if answer == 'n':
+    if answer.lower() == 'n' or answer.lower() == 'no':
         print FAIL + "Deletion aborted" + END
-    elif answer == 'y':
-        name = wallet_name.name
+    elif answer.lower() == 'y' or answer.lower() == 'yes':
+        name = wallet_name
         print FAIL + "Wallet to delete: " + name + END
         proof = raw_input("Please type the name of the wallet to finalize decision [" + name + "]: ")
         if proof == name:
@@ -40,15 +40,15 @@ def delete_wallet(wallets, wallet_name):
             print FAIL + "Name improperly typed. Aborting!" + END
 
 
-def specific_wallet_input(wallets, guide, index, blockchain):
+def specific_wallet_input(wallets, guide, index, local_blockchain):
     selection = ""
     selected_wallet = wallets[guide[int(index)]]
     approved_input = ['0', '1', 'd']
     while selection != 'exit':
-        print "\033[H\033[J",  # Note the comma
-        print "\r(0) Display Address"  # \r is to clear that line
+        print "\033[H\033[J\r",  # Note the comma
+        print "(0) Display Address"
         print "(1) Send Amount to Other Wallet"
-        selected_wallet.display_address_and_balance(blockchain)
+        selected_wallet.display_address_and_balance(local_blockchain)
         print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
         print "To delete this wallet please enter 'd' and hit [Enter]"
 
@@ -65,20 +65,20 @@ def specific_wallet_input(wallets, guide, index, blockchain):
             if selection == '1':
                 to = raw_input("What is the public address of the wallet you'd like to send to?: ")
                 amount = raw_input("How much would you like to send? [Current funds: " +
-                                   str(selected_wallet.get_balance(blockchain)) + "]: ")
+                                   str(selected_wallet.get_balance(local_blockchain)) + "]: ")
                 transaction = selected_wallet.create_transaction(amount, to)
                 validation = selected_wallet.broadcast_transaction(transaction)
 
                 if validation:
                     print "Transaction was successful. Updating Blockchain"
-                    blockchain.update_blockchain()
+                    local_blockchain.update_blockchain()
                     raw_input("Transaction Complete. Press [Enter] to continue...")
                 else:
                     raw_input("Transcation Was Invalid. Press [Enter] to continue...")
 
             # If the input is 'd' we need to delete a wallet
             if selection == 'd':
-                delete_wallet(wallets, selected_wallet)
+                delete_wallet(wallets, selected_wallet.name)
                 selection = 'exit'
 
         else:
@@ -92,11 +92,15 @@ def lookup_wallet(local_blockchain, address):
 
 
 def main():
+    # Create a dictionary to hold wallets
     wallets = {}
+
+    # This will be our local instantiation of the Blockchain
     local_blockchain = Blockchain(is_node=False)
 
+    # Setting the approved input
     approved_input = ['c', 'i']
-    [approved_input.append(str(x)) for x in range(100)]
+    [approved_input.append(str(x)) for x in range(1000)]
 
     # The convention for identifying wallets it having the public and
     # private keys in a local directory with the name key-"wallet name"
@@ -108,9 +112,9 @@ def main():
     ans = ""
     if len(wallets.keys()) == 0:
         ans = raw_input("We didn't find a wallet, would you like to create one? [y/n]: ")
-        if ans == 'y':
+        if ans.lower() == 'y' or ans.lower() == 'yes':
             create_wallet(wallets)
-        if ans == 'n':
+        if ans.lower() == 'n' or ans.lower() == 'no':
             print FAIL + "With no keys we'll have to exit. Goodbye" + END
             exit(0)
 
