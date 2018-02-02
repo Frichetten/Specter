@@ -32,8 +32,8 @@ def receive_tranactions():
     # We just received data from a wallet or node. We now need to
     # package it into a block and add it to the blockchain. First
     # We must validate it.
-    if authenticate_transaction(transaction):
-        if validate_transaction(transaction):
+    if node.authenticate_transaction(transaction):
+        if node.validate_transaction(transaction):
             print OK + "Valid Transaction Received" + END
             blockchain.make_block(transaction)
             return "Confirmation"
@@ -45,16 +45,6 @@ def receive_tranactions():
 @app.route('/getblockchain', methods=['GET'])
 def getblockchain():
     return jsonify(blockchain.jsonify())
-
-
-def authenticate_transaction(transaction):
-    is_verified = wallet.verify_remote_transaction(transaction['from'], transaction['signature'], transaction)
-    return is_verified
-
-
-def validate_transaction(transaction):
-    is_validated = blockchain.validate_transaction(transaction)
-    return is_validated
 
 
 def print_ascii():
@@ -85,17 +75,7 @@ if __name__ == '__main__':
     # Spawn out own node and get blockchain
     node = Node()
     blockchain = node.blockchain
-    wallet = None
-
-    # Our node should have its own wallet.
-    # The convention for node wallets is different from a
-    # standard wallet. Those keys should be in a directory
-    # called nodekey. This is because a node should have
-    # only one address to mine from. As well as to simplify
-    # the issue of having a normal wallet in the same directory.
-    for item in os.listdir('.'):
-        if 'nodekey' in item:
-            wallet = Wallet(item)
+    wallet = node.wallet
 
     if wallet is None:
         print FAIL + 'No wallet detected. Let\'s generate one' + END

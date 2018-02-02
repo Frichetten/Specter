@@ -1,10 +1,6 @@
 # Specter BlockChain Implementation
 # Nick Frichette 12/9/2017
-"""For now the block chain will be in memory
-    At some point, this will get written to 
-    disk (I'm not sure what format). Then at 
-    startup it will pull the latest blockchain 
-    from the nodes in the network"""
+
 import json
 import hashlib
 import requests
@@ -20,10 +16,11 @@ OK = '\033[92m'
 
 
 class Blockchain:
-   
+
+    NODE_ADDRESS_LIST = ['http://localhost:5000']
+
     blocks = []
     index = 0
-    address_list = ['http://localhost']
     db = None
 
     def __init__(self, is_node=False):
@@ -58,24 +55,24 @@ class Blockchain:
         else:
             # This is an implementation meant for normal users
             try:
-                blockchain_json = self.download_blockchain(self.address_list)
+                blockchain_json = self.download_blockchain()
                 self.unjsonify(blockchain_json)
             except requests.exceptions.ConnectionError:
                 print FAIL + "Failed to connect to nodes. Terminating" + END
                 exit()
 
-    def download_blockchain(self, address_list):
+    def download_blockchain(self):
         # Query the nodes for the blockchain
         # In the future validation will need to occur
         blockchain_json = []
-        for address in self.address_list:
-            request = requests.get(address + ':5000/getblockchain')
+        for address in self.NODE_ADDRESS_LIST:
+            request = requests.get(address + '/getblockchain')
             blockchain_json = request.json()
         return blockchain_json
 
     def update_blockchain(self):
         try:
-            blockchain_json = self.download_blockchain(self.address_list)
+            blockchain_json = self.download_blockchain()
             self.blocks = []
             self.unjsonify(blockchain_json)
         except requests.exceptions.ConnectionError:

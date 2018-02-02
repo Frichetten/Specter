@@ -13,7 +13,6 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives.asymmetric import rsa
-from cryptography.exceptions import InvalidSignature
 
 # ANSI escape sequences
 FAIL = '\033[91m'
@@ -58,12 +57,6 @@ class Wallet:
         # Load keys
         self.publicKey = self.load_key(wallet_name + '/Public')
         self.privateKey = self.load_key(wallet_name + '/Private')
-
-        # Here we would do one of two things. Either we would load our
-        # current blockchain from disk and then download anything we
-        # are missing, or we would download the whole thing if we didn't
-        # previously have it downloaded. Because we are still a prototype
-        # we will always download the whole wallet at startup.
 
         """ The following is outdated logic. A wallet should not maintain a full copy of the 
             block chain. This doesn't make any sense if you consider having multiple wallets.
@@ -146,41 +139,6 @@ class Wallet:
             if block.transaction_info['to'] == address:
                 balance += block.transaction_info['amount']
         return balance
-
-    def verify_remote_transaction(self, public_key, signature, transaction):
-        # transaction.pop('hash')
-        transaction = self.create_signable_transaction(
-            transaction['from'],
-            transaction['to'],
-            transaction['amount'],
-            transaction['timestamp']
-        )
-
-        key = "-----BEGIN PUBLIC KEY-----\n"
-        i = 0
-        while i < len(public_key):
-            key += public_key[i:i+64]+'\n'
-            i += 64
-        key += "-----END PUBLIC KEY-----\n"
-
-        public_key = serialization.load_pem_public_key(
-            str(key),
-            backend=default_backend()
-        )
-
-        try:
-            public_key.verify(
-                bytes(base64.decodestring(signature)),
-                bytes(transaction),
-                padding.PSS(
-                    mgf=padding.MGF1(hashes.SHA256()),
-                    salt_length=padding.PSS.MAX_LENGTH
-                ),
-                hashes.SHA256()
-            )
-            return True
-        except InvalidSignature:
-            return False
 
     def get_address(self):
         address = self.serialize_public_key(self.publicKey)
