@@ -74,7 +74,7 @@ def specific_wallet_input(wallets, guide, index, local_blockchain):
                     local_blockchain.update_blockchain()
                     raw_input("Transaction Complete. Press [Enter] to continue...")
                 else:
-                    raw_input("Transcation Was Invalid. Press [Enter] to continue...")
+                    raw_input("Transaction Was Invalid. Press [Enter] to continue...")
 
             # If the input is 'd' we need to delete a wallet
             if selection == 'd':

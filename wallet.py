@@ -68,8 +68,8 @@ class Wallet:
         """ The following is outdated logic. A wallet should not maintain a full copy of the 
             block chain. This doesn't make any sense if you consider having multiple wallets.
             Each wallet tracking their own blockchain would become expensive quickly. Instead 
-            the application running the wallets (wether that is the multiwallet or the node 
-            itself) should handle the blockcahin. """
+            the application running the wallets (whether that is the multiwallet or the node 
+            itself) should handle the blockchain. """
 
         # Download the blockchain from localhost
         # try:
