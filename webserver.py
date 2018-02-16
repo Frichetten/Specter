@@ -35,7 +35,7 @@ def receive_tranactions():
     if node.authenticate_transaction(transaction):
         if node.validate_transaction(transaction):
             print OK + "Valid Transaction Received" + END
-            blockchain.make_block(transaction)
+            blockchain.add_transaction_to_pool(transaction)
             return "Confirmation"
         else:
             return "Invalid"

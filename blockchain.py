@@ -5,8 +5,8 @@ import json
 import hashlib
 import requests
 
+from threading import Thread
 
-from block import *
 from database_orm import *
 
 # ANSI escape sequences
@@ -22,6 +22,8 @@ class Blockchain:
     blocks = []
     index = 0
     db = None
+
+    transaction_pool = []
 
     def __init__(self, is_node=False):
 
@@ -51,6 +53,13 @@ class Blockchain:
                         item.nonce
                     )
                     self.add_block(block)
+
+            # Unverified transactions are added to the transaction pool
+            # A separate thread will put them onto the block chain.
+            # This should be more preformat at scale.
+            trans_thread = Thread(target=self.transaction_thread)
+            trans_thread.daemon = true
+            trans_thread.start()
 
         else:
             # This is an implementation meant for normal users
@@ -194,6 +203,15 @@ class Blockchain:
             return True
         else:
             return False
+
+    def transaction_thread(self):
+        while true:
+            while len(self.transaction_pool) > 0:
+                print "Pulling from Transaction Pool"
+                self.make_block(self.transaction_pool.pop())
+
+    def add_transaction_to_pool(self, transaction):
+        self.transaction_pool.append(transaction)
 
 
 if __name__ == '__main__':
