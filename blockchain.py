@@ -4,10 +4,17 @@
 import json
 import hashlib
 import requests
+import base64
 
 from threading import Thread
 
 from database_orm import *
+
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric import padding
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import hashes
+from cryptography.exceptions import InvalidSignature
 
 # ANSI escape sequences
 FAIL = '\033[91m'
@@ -204,11 +211,57 @@ class Blockchain:
         else:
             return False
 
+    @staticmethod
+    def create_signable_transaction(from_address, to_address, amount, timestamp):
+        return ':'.join((from_address, to_address, amount, str(timestamp)))
+
+    def authenticate_transaction(self, transaction):
+        is_verified = self.verify_remote_transaction(transaction['from'], transaction['signature'], transaction)
+        return is_verified
+
+    def verify_remote_transaction(self, public_key, signature, transaction):
+        # transaction.pop('hash')
+        transaction = self.create_signable_transaction(
+            transaction['from'],
+            transaction['to'],
+            transaction['amount'],
+            transaction['timestamp']
+        )
+
+        key = "-----BEGIN PUBLIC KEY-----\n"
+        i = 0
+        while i < len(public_key):
+            key += public_key[i:i+64]+'\n'
+            i += 64
+        key += "-----END PUBLIC KEY-----\n"
+
+        public_key = serialization.load_pem_public_key(
+            str(key),
+            backend=default_backend()
+        )
+
+        try:
+            public_key.verify(
+                bytes(base64.decodestring(signature)),
+                bytes(transaction),
+                padding.PSS(
+                    mgf=padding.MGF1(hashes.SHA256()),
+                    salt_length=padding.PSS.MAX_LENGTH
+                ),
+                hashes.SHA256()
+            )
+            return True
+        except InvalidSignature:
+            return False
+
     def transaction_thread(self):
         while true:
             while len(self.transaction_pool) > 0:
-                print "Pulling from Transaction Pool"
-                self.make_block(self.transaction_pool.pop())
+                transaction = self.transaction_pool[-1]
+                if self.authenticate_transaction(transaction):
+                    if self.validate_transaction(transaction):
+                        print OK + "Confirmed Transaction" + END
+                        self.make_block(self.transaction_pool.pop())
 
     def add_transaction_to_pool(self, transaction):
         self.transaction_pool.append(transaction)

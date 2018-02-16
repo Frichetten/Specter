@@ -32,14 +32,8 @@ def receive_tranactions():
     # We just received data from a wallet or node. We now need to
     # package it into a block and add it to the blockchain. First
     # We must validate it.
-    if node.authenticate_transaction(transaction):
-        if node.validate_transaction(transaction):
-            print OK + "Valid Transaction Received" + END
-            blockchain.add_transaction_to_pool(transaction)
-            return "Confirmation"
-        else:
-            return "Invalid"
-    return "Invalid"
+    blockchain.add_transaction_to_pool(transaction)
+    return 'Confirmation'
 
 
 @app.route('/getblockchain', methods=['GET'])
