@@ -185,6 +185,8 @@ class Blockchain:
         return hashed.hexdigest()
 
     def add_block(self, block):
+        if not self.db.in_db(block):
+            self.db.insert_block(block)
         self.blocks.append(block)
 
     def lookup_address(self, address):
@@ -260,8 +262,10 @@ class Blockchain:
                 transaction = self.transaction_pool[-1]
                 if self.authenticate_transaction(transaction):
                     if self.validate_transaction(transaction):
+                        print str(len(self.blocks))
                         print OK + "Confirmed Transaction" + END
                         self.make_block(self.transaction_pool.pop())
+                        print str(len(self.blocks))
 
     def add_transaction_to_pool(self, transaction):
         self.transaction_pool.append(transaction)
