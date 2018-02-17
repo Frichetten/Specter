@@ -2,6 +2,7 @@
 * Pip           (Depends on your operating system)
 * Cryptography  (sudo pip install cryptography)
 * Flask         (sudo pip install flask)
+* SQLAlchemy    (sudo pip install sqlalchemy)
 
 ## How To Install and Run Specter
 Please be aware that Specter uses Python 2.7. This may change in the future, but for right now that is what we are using.
