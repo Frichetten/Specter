@@ -46,7 +46,6 @@ class Blockchain:
                 print OK + 'Creating Genesis Block' + END
                 genesis = self.make_genesis_block()
                 self.add_block(genesis)
-                self.db.insert_block(genesis)
             else:
                 # For each row in the DB, create a block
                 blocks = self.db.get_all_blocks()
@@ -64,9 +63,9 @@ class Blockchain:
             # Unverified transactions are added to the transaction pool
             # A separate thread will put them onto the block chain.
             # This should be more preformat at scale.
-            trans_thread = Thread(target=self.transaction_thread)
-            trans_thread.daemon = true
-            trans_thread.start()
+            #trans_thread = Thread(target=self.transaction_thread)
+            #trans_thread.daemon = true
+            #trans_thread.start()
 
         else:
             # This is an implementation meant for normal users
@@ -124,8 +123,8 @@ class Blockchain:
             self.blocks.append(block)
 
             # If not in the DB, insert it
-            if not self.db.in_db(block):
-                self.db.insert_block(block)
+            #if not self.db.in_db(block):
+            #    self.db.insert_block(block)
 
         return None
 
@@ -134,6 +133,8 @@ class Blockchain:
         return self.blocks
 
     def add_block(self, block):
+        if not self.db.in_db(block):
+            self.db.insert_block(block)
         self.blocks.append(block)
 
     def make_block(self, transaction):
@@ -162,7 +163,7 @@ class Blockchain:
                   "Z6YHyaOBUpMp3mvPMVqM/jeI2aslJDTEDmeaRhs6yI90RDyohzb1FUctUKVPiL8a"+
                   "FI9/gKmSCpgB8BEpI23K0az4kbItnWLe3xzABSFL0nSQWkXQqWmepKcDwp6TcJtG"+
                   "/U5BSE284qlQFOd50rW0xRUCAwEAAQ==",
-            "amount": 10,
+            "amount": 100,
             "signature": "-1",
             "timestamp": -1,
             "hash": -1
@@ -183,11 +184,6 @@ class Blockchain:
         data_json = json.dumps(data, sort_keys=True)
         hashed = hashlib.sha256(data_json)
         return hashed.hexdigest()
-
-    def add_block(self, block):
-        if not self.db.in_db(block):
-            self.db.insert_block(block)
-        self.blocks.append(block)
 
     def lookup_address(self, address):
         # Begin searching for transactions from that address
@@ -256,19 +252,22 @@ class Blockchain:
         except InvalidSignature:
             return False
 
-    def transaction_thread(self):
-        while true:
-            while len(self.transaction_pool) > 0:
-                transaction = self.transaction_pool[-1]
-                if self.authenticate_transaction(transaction):
-                    if self.validate_transaction(transaction):
-                        print str(len(self.blocks))
-                        print OK + "Confirmed Transaction" + END
-                        self.make_block(self.transaction_pool.pop())
-                        print str(len(self.blocks))
+    #def transaction_thread(self):
+    #    while true:
+    #        while len(self.transaction_pool) > 0:
+    #            transaction = self.transaction_pool[-1]
+    #            if self.authenticate_transaction(transaction):
+    #                if self.validate_transaction(transaction):
+    #                    print str(len(self.blocks))
+    #                    print OK + "Confirmed Transaction" + END
+    #                    self.make_block(self.transaction_pool.pop())
+    #                    print str(len(self.blocks))
 
     def add_transaction_to_pool(self, transaction):
-        self.transaction_pool.append(transaction)
+        #self.transaction_pool.append(transaction)
+        if self.authenticate_transaction(transaction):
+            if self.validate_transaction(transaction):
+                self.make_block(transaction)
 
 
 if __name__ == '__main__':
