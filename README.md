@@ -1,5 +1,4 @@
 # Specter
-[![first-timers-only](http://img.shields.io/badge/first--timers--only-friendly-blue.svg?style=flat-square)](http://www.firsttimersonly.com/)
 <p align="center">
   <img src=https://github.com/frichetten/specter/raw/master/specter.png />
 </p>
