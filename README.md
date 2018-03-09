@@ -10,9 +10,6 @@ Python 3 will be supported likely after a Version 1.0 is developed. A Python 3 b
 
 **What makes Specter unique as a cryptocurrency?:** Unlike most cryptocurrencies, Specter isn't trying to become an ICO or get sold on an exchange. Instead, Specter is a research project focused on overcoming the technical challenges of Blockchain technology.
 
-### Do You Accept New Developers on the Project?
-YES! Absolutely! I am happy to help new developers on their path to contribute to open source. Please see our contributing guidelines as to how to get started.
-
 Satoshi Nakamoto's original white paper can be found [here](https://bitcoin.org/bitcoin.pdf)
 
 Want to donate to support the project? 
