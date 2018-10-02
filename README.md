@@ -8,6 +8,10 @@ Specter is a prototype cryptocurrency designed to help people learn about Blockc
 
 Python 3 will be supported likely after a Version 1.0 is developed. A Python 3 branch is already setup.
 
+**Install  
+
+`pip install -r requirements.txt`  
+
 **What makes Specter unique as a cryptocurrency?:** Unlike most cryptocurrencies, Specter isn't trying to become an ICO or get sold on an exchange. Instead, Specter is a research project focused on overcoming the technical challenges of Blockchain technology.
 
 Satoshi Nakamoto's original white paper can be found [here](https://bitcoin.org/bitcoin.pdf)
