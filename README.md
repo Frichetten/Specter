@@ -8,7 +8,7 @@ Specter is a prototype cryptocurrency designed to help people learn about Blockc
 
 Python 3 will be supported likely after a Version 1.0 is developed. A Python 3 branch is already setup.
 
-**Install  
+##Install  
 
 `pip install -r requirements.txt`  
 
